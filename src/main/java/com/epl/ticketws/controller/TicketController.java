@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -145,10 +146,23 @@ public class TicketController {
 		}
 	}	
 	
+	@RequestMapping("/delete")
+	public Response erase(){			
+		log.info("Disponibilidad sin parámetros");
+		log.info("URL -->"+urlDispo);
+		Response response = new Response("?");				 
+		this.ticketRepo.deleteAll(); // Borrar todos los datos
+		this.modalidadRepo.deleteAll();
+		this.servicioRepo.deleteAll();
+		response.setResult("delete OK");
+		response.setErrorMsg("");
+		return response;
+	}
+	
 	@RequestMapping("/load")
 	public Response load(){			
-		log.debug("Disponibilidad sin parámetros");
-		log.debug("URL -->"+urlDispo);
+		log.info("Disponibilidad sin parámetros");
+		log.info("URL -->"+urlDispo);
 		Response response = new Response("?");				 
 		this.ticketRepo.deleteAll(); // Borrar todos los datos
 		this.modalidadRepo.deleteAll();
@@ -198,6 +212,7 @@ public class TicketController {
 	
 	
 	@RequestMapping("/avail")
+	@Cacheable("book")
 	public DisponibilidadGeneralRespuesta availability(){				
 		Iterable<Servicio> servicios= servicioRepo.findAll();
 		return getXMLResponse(servicios);		
@@ -240,7 +255,8 @@ public class TicketController {
 	 * @return
 	 */
 	@RequestMapping("/detail/{modId}/{fecha}")
-	public boolean detail(@PathVariable String modId, int nclientes, @PathVariable Date fecha){				
+	public boolean detail(@PathVariable String modId, int nclientes, @PathVariable Date fecha){
+		log.info("Comprobación de disponibilidad");
 		SessionInfo sessionInfo = oneboxEngineInfo.query(String.format(urlInfo, modId, fecha), "GET", SessionInfo.class);
 		int cupo = sessionInfo.getAvailabilityInfo().getTotal()-sessionInfo.getAvailabilityInfo().getAvailable();
 		return cupo>nclientes;		
