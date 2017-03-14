@@ -3,7 +3,6 @@ package com.epl.ticketws.dto;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
@@ -92,5 +91,14 @@ public class Ticket  {
 	public void setServicio(Servicio servicio) {
 		this.servicio = servicio;
 	}		
+	
+	@Override
+	public String toString(){
+		return String.format("%d %d %d %s", this.getServicio().getId(), 
+											this.getModalidad().getId(), 
+											this.getTicketPK().getId(), 
+											this.getModalidad());
+	}
+	
 	
 }	
