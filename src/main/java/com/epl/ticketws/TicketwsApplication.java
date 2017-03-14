@@ -12,7 +12,6 @@ public class TicketwsApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TicketwsApplication.class, args);
-	}
-		
+	}	
 	
 }

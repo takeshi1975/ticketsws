@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.cache.annotation.CacheResult;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -212,7 +213,7 @@ public class TicketController {
 	
 	
 	@RequestMapping("/avail")
-	@Cacheable("book")
+	@CacheResult
 	public DisponibilidadGeneralRespuesta availability(){				
 		Iterable<Servicio> servicios= servicioRepo.findAll();
 		return getXMLResponse(servicios);		
