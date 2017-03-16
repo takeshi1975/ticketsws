@@ -3,7 +3,7 @@ package com.epl.ticketws.bussiness;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.epl.tickets.model.InformeCrearRespuesta;
 import com.epl.ticketws.services.QueryService;
@@ -14,10 +14,10 @@ import es.oneboxtm.ns.purchase.order.Ticket;
 /**
  * Created by gcortes on 14/03/2017.
  */
-@Service
+@Component
 public class Voucher {
     @Value("${app.onebox.url.ticketsPDF}")
-    private static  String url_ticketsPDF = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/order/syncTicketsPDF";
+    private String url_ticketsPDF = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/order/syncTicketsPDF";
 
     @Autowired
     private  QueryService<OrderTickets> oneboxTickets;

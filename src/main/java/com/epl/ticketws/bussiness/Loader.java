@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.epl.onebox.model.ActivityTicketTypeAvailability;
 import com.epl.onebox.model.BasicInfoSessionSearchInfo;
@@ -24,7 +24,7 @@ import com.epl.ticketws.repo.ServicioRepo;
 import com.epl.ticketws.repo.TicketRepo;
 import com.epl.ticketws.services.QueryService;
 
-@Service
+@Component
 public class Loader {
 
 	private int errorService = 0;

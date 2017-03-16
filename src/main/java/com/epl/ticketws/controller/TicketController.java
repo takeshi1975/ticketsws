@@ -31,7 +31,7 @@ import com.epl.ticketws.services.QueryService;
 
 @RestController
 @RequestMapping("/tickets")
-@ComponentScan({"com.epl.ticketws.services", "com.epl.ticketws.repo"})
+@ComponentScan({"com.epl.ticketws.services", "com.epl.ticketws.bussiness"})
 public class TicketController {
 
 	private final Logger log =Logger.getLogger(TicketController.class);
@@ -72,43 +72,8 @@ public class TicketController {
 	@RequestMapping(value="/load",method=RequestMethod.GET, produces=MediaType.APPLICATION_XML_VALUE)
 	public Response load(){			
 		return loader.load();
-	}		
-	
-	/*
-	public DisponibilidadGeneralRespuesta getXMLResponse(Iterable<Servicio> servicios, Date ... dates ){
-		DisponibilidadGeneralRespuesta dgr = new DisponibilidadGeneralRespuesta();
-		for (Servicio servicio:servicios){
-			Infgen infgen = new Infgen();
-			infgen.setCoddiv("EUR");
-			infgen.setCupest("DS");
-			infgen.setCodtou("EPL");
-			infgen.setCodtse("ACTI");
-			infgen.setId((int)servicio.getId());
-			infgen.setNomser(servicio.getServicio());
-			infgen.setCodser((int)servicio.getId());							
-			Iterable<Modalidad> modalidades = modalidadRepo.findByServiceAndDate(servicio.getId(), new Date());
-			
-			for (Modalidad modalidad:modalidades){
-				Iterable <Ticket> tickets = ticketRepo.findByModalidadId(modalidad.getId());
-				for (Ticket ticket:tickets){
-					Infsmo infsmo = new Infsmo();
-					infsmo.setCodsmo(String.valueOf(modalidad.getId()));
-					infsmo.setCodcon(modalidad.getModalidad());
-					infsmo.setCodcha(ticket.getCaracteristica());
-					infsmo.setCupest("DS");
-					infsmo.setAdlmax(ticket.getCaracteristica().contains("Adulto")?1:0);					
-					infsmo.setNinmax(ticket.getCaracteristica().contains("Junior")?1:0);					
-					infsmo.setRefdis((int)ticket.getTicketPK().getId());
-					infsmo.setImpcom(ticket.getPrecio());
-					infgen.getInfsmo().add(infsmo);
-				}												 
-			}
-			dgr.getInfgen().add(infgen);
-		}		
-		return dgr;
-	} */
-	
-	
+	}			
+		
 	/**
 	 * Disponibilidad sin parámetros.
 	 * @return

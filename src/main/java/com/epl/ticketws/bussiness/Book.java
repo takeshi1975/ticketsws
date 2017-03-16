@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.epl.tickets.model.Estsmo;
 import com.epl.tickets.model.Purchase;
@@ -25,21 +25,21 @@ import es.oneboxtm.ns.shopping.cart.ShoppingCart;
  * Created by gcortes on 10/03/2017.
  */
 
-@Service
+@Component
 public class Book{
     
 	@Value("${app.onebox.url.create}")
-    private static final String url_create = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/shoppingCart/create";
+    private String url_create = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/shoppingCart/create";
     @Value("${app.onebox.url.addIndividualActivitySeats}")
-    private static final String url_addIndividualActivitySeats = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/shoppingCart/addIndividualActivitySeats";
+    private String url_addIndividualActivitySeats = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/shoppingCart/addIndividualActivitySeats";
     @Value("${app.onebox.url.clientData}")
-    private static final String url_clientData = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/shoppingCart/clientData";
+    private String url_clientData = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/shoppingCart/clientData";
     @Value("${app.onebox.url.delivery}")
-    private static final String url_delivery = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/shoppingCart/delivery";
+    private String url_delivery = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/shoppingCart/delivery";
     @Value("${app.onebox.url.createOrder}")
-    private static final String url_createOrder = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/order/createOrder";
+    private String url_createOrder = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/order/createOrder";
     @Value("${app.onebox.url.commitOrder}")
-    private static final String url_commitOrder = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/order/commitOrder";
+    private String url_commitOrder = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/order/commitOrder";
 
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
   

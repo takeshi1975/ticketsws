@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.epl.onebox.model.ActivityTicketTypeAvailability;
 import com.epl.onebox.model.BasicInfoSessionSearchInfo;
@@ -19,11 +19,11 @@ import com.epl.ticketws.services.QueryService;
 /**
  * Created by gcortes on 09/03/2017.
  */
-@Service
+@Component
 public class Availability {
 	
     @Value("${app.onebox.url.search}")
-    private static  String url_dispo = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/events/search";
+    private String url_dispo = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/events/search";
 
     @Autowired
     private  QueryService<EventsSearch> oneboxDispo;
