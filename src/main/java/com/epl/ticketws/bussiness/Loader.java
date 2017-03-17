@@ -138,7 +138,7 @@ public class Loader {
 		log.info("URL -->"+urlDispo);
 		Response response = new Response("?");				 
 		erase();// Borrar los datos previos 
-		EventsSearch eventsSearch = oneboxEngineAvail.query(urlDispo, "GET", EventsSearch.class);	
+		EventsSearch eventsSearch = oneboxEngineAvail.query(urlDispo, "GET","XML", EventsSearch.class,null);	
 		loadServices(eventsSearch);  // Consultar onebox y cargar la cache.
 		String msg = String.format("Errors S[%d/%d] M[%d/%d] T[%d/%d]", errorService,loadedService, 
 													  errorModality, loadedModality, 

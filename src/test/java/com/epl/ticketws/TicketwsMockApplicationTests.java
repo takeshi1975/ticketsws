@@ -25,7 +25,6 @@ public class TicketwsMockApplicationTests {
 	public void contextLoads() throws Exception {
 		// de momento no pongo el test todavía
 		 this.mockmvc.perform(get("/greeting")).andDo(print()).andExpect(status().isOk());
-	}
-		    
+	}			    
 	
 }

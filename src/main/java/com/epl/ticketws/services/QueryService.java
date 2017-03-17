@@ -1,15 +1,9 @@
 package com.epl.ticketws.services;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
 import java.security.SignatureException;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import javax.crypto.Mac;
@@ -17,41 +11,42 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.epl.onebox.model.ActivityTicketTypeAvailability;
+import com.epl.onebox.model.BasicInfoSessionSearchInfo;
+import com.epl.onebox.model.EventSearchInfo;
+import com.epl.onebox.model.EventsSearch;
+
 
 @Service
-@Configuration("classpath:application.properties")
 public class QueryService<T> {
-    
-	@Value("${app.onebox.user}")    		  
+
+    private static final Logger logger = Logger.getLogger(QueryService.class);    
+    @Value("${app.onebox.user}")
     private String user;
-    
     @Value("${app.onebox.password}")
     private String password;
-    
     @Value("${app.onebox.terminal}")
     private String terminal;
-    
     @Value("${app.onebox.license}")
     private String license;
-    
     @Value("${app.onebox.channel}")
     private String channel;
-    
     @Value("${app.onebox.pos}")
     private String pos;
     
-    private static final Logger logger = Logger.getLogger(QueryService.class);
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
     private static final String UTF_8 = "UTF-8";
     private static final String PARAM_NAME_VALUE_SEPARATOR = "=";
@@ -60,33 +55,37 @@ public class QueryService<T> {
     private static final String PARAMETERS_SEPARATOR = "&";
     private static final String AUTHORIZATION_HEADER_HMAC_PREFIX = "OB_HMAC ";
     
-    public T query(String url, String method, Class<T> rc){
-    	return query( url, method, rc, null);
-    }
-    
-    public T query(String url, String method, Class<T> rc, Map<String, String> parameters) {                
-    	logger.info("user: "+user);    	
-    	logger.info("terminal "+terminal);
-    	logger.info("license "+license);
-    	logger.info("terminal "+terminal);
-        try {            
-            URI uri = new URL(url).toURI();            
+    public T query(String url, String method, String accept, Class<T> rc, Map<String, String> parameters) {
+        
+        Exception ex = null;
+       
+        try {
+
+
+
+            URI uri = new URL(url).toURI();
             long timestamp = new Date().getTime();
 
             HttpMethod httpMethod;
-            httpMethod = HttpMethod.GET;
-            if (method.equalsIgnoreCase("post")) 
-                httpMethod = HttpMethod.POST;             
-            
-            String stringToSign = getStringToSign(uri, httpMethod.name(), timestamp);
+            if (method.equalsIgnoreCase("post")) {
+                httpMethod = HttpMethod.POST;
+            }else{
+                httpMethod = HttpMethod.GET;
+            }
 
-            logger.info("String to sign: " + stringToSign);            
+            String stringToSign = getStringToSign(uri, httpMethod.name(), timestamp, parameters);
+
+           // logger.info("String to sign: " + stringToSign);
             String authorization = generate_HMAC_SHA1_Signature(stringToSign,password + license);
-            logger.info("Authorization string: " + authorization);
+            // logger.info("Authorization string: " + authorization);
             
             // Setting Headers
             HttpHeaders headers = new HttpHeaders();
-            headers.setAccept(Arrays.asList(MediaType.TEXT_XML));            
+            if (accept.equalsIgnoreCase("json")) {
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            } else {
+                headers.setAccept(Arrays.asList(MediaType.TEXT_XML));
+            }
 
             headers.add("Authorization", authorization);
             headers.add("OB_DATE", ""+timestamp);
@@ -94,6 +93,7 @@ public class QueryService<T> {
             headers.add("OB_User", user);
             headers.add("OB_Channel", channel);
             headers.add("OB_POS", pos);
+            headers.add("Content-Type","application/x-www-form-urlencoded");
 
             HttpEntity<String> entity;
 
@@ -101,42 +101,55 @@ public class QueryService<T> {
                 // Adding post parameters to POST body
             	String parameterStringBody = getParametersAsString(parameters);
                 entity = new HttpEntity<String>(parameterStringBody, headers);
-                logger.info("POST Body: " + parameterStringBody);
+               // logger.info("POST Body: " + parameterStringBody);
             } else {
                 entity = new HttpEntity<String>(headers);
             }
 
-            RestTemplate restTemplate = new RestTemplate();
+//            RestTemplate restTemplate = new RestTemplate();
+
+            RestTemplate restTemplate  = new RestTemplate(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
+            List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
+            interceptors.add(new LoggingRequestInterceptor());
+            restTemplate.setInterceptors(interceptors);
 
             // Converting to UTF-8. OB Rest replies in windows charset.
-            restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName(UTF_8)));
-            
-            /**
-            ResponseEntity<String> responseStr = restTemplate.exchange(uri, httpMethod, entity, String.class);
-            logger.info(responseStr.toString());
-            **/
-            
-            restTemplate.getMessageConverters().add(0, new org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter());
+            //restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName(UTF_8)));
+
+            if (accept.equalsIgnoreCase("json")) {
+                restTemplate.getMessageConverters().add(0, new org.springframework.http.converter.json.MappingJackson2HttpMessageConverter());
+            }else{
+                restTemplate.getMessageConverters().add(0, new org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter());
+            }
+
+
             ResponseEntity<T> response = restTemplate.exchange(uri, httpMethod, entity, rc);
-             
+              
             if (!response.getStatusCode().is2xxSuccessful())
             	throw new HttpClientErrorException(response.getStatusCode());
-            
+
+
             return response.getBody();	            
         } catch (HttpClientErrorException e) {
             logger.error(e.getMessage());
+            ex = e;
             e.printStackTrace();            
         } catch (MalformedURLException e) {
             logger.error(e.getMessage());
-            e.printStackTrace();            
+            ex = e;
+            e.printStackTrace();
+            
         } catch (SignatureException e) {
             logger.error(e.getMessage());
+            ex = e;
             e.printStackTrace();            
         } catch (URISyntaxException e) {
             logger.error(e.getMessage());
+            ex = e;
             e.printStackTrace();            
         } catch (Exception e) {
             logger.error(e.getMessage());
+            ex = e;
             e.printStackTrace();            
         }             
         return null;
@@ -173,18 +186,17 @@ public class QueryService<T> {
      * @return
      * @throws SignatureException
      */
-    private String getStringToSign(URI uri,String method, long timestamp) throws SignatureException {
+    private String getStringToSign(URI uri,String method, long timestamp,Map<String, String> params) throws SignatureException {
 
-    	/*
-    	 SortedMap<String,String> sortedMap = new TreeMap<String, String>();
-        
+        SortedMap<String,String> sortedMap = new TreeMap<String, String>();
+
         // Assuming GET. It actually processes URL parameters for all Method types
         if (uri.getRawQuery()!=null) {
 
             StringTokenizer tokenizer = null;
             try
             {
-                tokenizer = new StringTokenizer(URLDecoder.decode(uri.getRawQuery(), UTF_8),AMPERSAND);
+                tokenizer = new StringTokenizer(URLDecoder.decode(uri.getRawQuery(), UTF_8),PARAMETERS_SEPARATOR );
             }
             catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -200,19 +212,34 @@ public class QueryService<T> {
         // If POST process parameter map
         if(method.equals(HttpMethod.POST.name()))
         {
-            for (String key : ((Set<String>)((MultiMap)queryForm.getFormParameters()).keySet())) {
-                for (String valor : ((List<String>) ((MultiMap) queryForm.getFormParameters()).get(key))){
+            for (String key : params.keySet()) {
+                    String valor = params.get(key);
                     sortedMap.put(key.toLowerCase()+PARAM_NAME_VALUE_SEPARATOR+valor,key+ PARAM_NAME_VALUE_SEPARATOR +valor);
-                }
             }
+
+
         }
-*/
         // Generating String to sign
         StringBuilder stringToSign = new StringBuilder();
         stringToSign.append(method);
         stringToSign.append(HMAC_FIELD_SEPARATOR).append(timestamp);
         stringToSign.append(HMAC_FIELD_SEPARATOR).append(uri.getPath());
-        stringToSign.append("?eventType=ACTIVITY");        
+
+        boolean firstParam=true;
+
+        for (String param : sortedMap.values())
+        {
+            if(firstParam)
+            {
+                stringToSign.append(URI_PARAMETERS_SEPARATOR).append(param);
+                firstParam=false;
+            }
+            else
+            {
+                stringToSign.append(PARAMETERS_SEPARATOR).append(param);
+            }
+        }
+
         return stringToSign.toString();
     }
 
@@ -227,6 +254,7 @@ public class QueryService<T> {
     private String generate_HMAC_SHA1_Signature(String data, String key) throws SignatureException
     {
         String result;
+
         try
         {
             // get an hmac_sha1 key from the raw key bytes
@@ -259,12 +287,14 @@ public class QueryService<T> {
     		String key = entry.getKey();
     		String value = entry.getValue();
     		if (isFirst){
-    			result += URI_PARAMETERS_SEPARATOR+key+PARAM_NAME_VALUE_SEPARATOR+value;
+    			result += key+PARAM_NAME_VALUE_SEPARATOR+value;
     			isFirst= false;
     		} else
     			result += PARAMETERS_SEPARATOR +key+PARAM_NAME_VALUE_SEPARATOR+value;
     	}
     	return result;
     }
+
+
 }
 

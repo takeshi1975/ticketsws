@@ -27,7 +27,9 @@ import es.oneboxtm.ns.shopping.cart.ShoppingCart;
 
 @Component
 public class Book{
-    
+
+	private final String XML = "xml";
+	
 	@Value("${app.onebox.url.create}")
     private String url_create = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/shoppingCart/create";
     @Value("${app.onebox.url.addIndividualActivitySeats}")
@@ -52,7 +54,7 @@ public class Book{
     public ReservaCerrarRespuesta book(Purchase purchase) {
         ReservaCerrarRespuesta rcr = new ReservaCerrarRespuesta();
 
-        ShoppingCart shoppingCart = oneboxData.query(url_create, "POST", ShoppingCart.class, new HashMap<>());
+        ShoppingCart shoppingCart = oneboxData.query(url_create, "POST", "xml", ShoppingCart.class, new HashMap<>());
         shoppingCart = addIndividualSeats(purchase, shoppingCart.getToken());
         shoppingCart = sendClientData(purchase, shoppingCart.getToken());
         shoppingCart = delivery(shoppingCart.getToken());
@@ -105,7 +107,7 @@ public class Book{
             params.put("token", token);
             params.put("idActivityTicketType", ticketOrder.getIdActivity());
 
-            clientData = oneboxData.query(url_addIndividualActivitySeats, "POST",  ShoppingCart.class, params);
+            clientData = oneboxData.query(url_addIndividualActivitySeats, "POST",XML,  ShoppingCart.class, params);
         }
 
         return clientData;
@@ -123,7 +125,7 @@ public class Book{
         params.put("lastName", purchase.getLastname() != null ? purchase.getLastname() : "");
         params.put("postalCode", "");
 
-        ShoppingCart clientData = oneboxData.query(url_clientData, "POST",  ShoppingCart.class, params);
+        ShoppingCart clientData = oneboxData.query(url_clientData, "POST", XML, ShoppingCart.class, params);
 
         return clientData;
 
@@ -134,7 +136,7 @@ public class Book{
         params.put("type", "1");
         params.put("token", token);
         params.put("orderDeliveryCost", "0.0");
-        ShoppingCart clientData = oneboxData.query(url_delivery, "POST",  ShoppingCart.class, params);
+        ShoppingCart clientData = oneboxData.query(url_delivery, "POST",XML,  ShoppingCart.class, params);
         return clientData;
     }
 
@@ -142,7 +144,7 @@ public class Book{
         SortedMap<String,String> params = new TreeMap<String, String>();
         params.put("orderType", "PURCHASE");
         params.put("token", token);
-        OrderDetails  orderDetails = oneboxDetails.query(url_createOrder, "POST",  OrderDetails .class, params);
+        OrderDetails  orderDetails = oneboxDetails.query(url_createOrder, "POST",XML, OrderDetails .class, params);
         return orderDetails;
     }
 
@@ -151,7 +153,7 @@ public class Book{
         params.put("orderCode", orderDetails.getOrderCode());
         String payments ="<payments xmlns=\"http://www.oneboxtm.es/ns/input-data/purchase/order\"><payment xmlns=\"http://www.oneboxtm.es/ns/input-data/purchase/order\" type=\"CASH\" value=\""+orderDetails.getToBePaid().toString() +"\" /></payments>";
         params.put("payments",payments );
-        OrderDetails clientData = oneboxDetails.query(url_commitOrder, "POST", OrderDetails.class, params);
+        OrderDetails clientData = oneboxDetails.query(url_commitOrder, "POST",XML, OrderDetails.class, params);
         return clientData;
 
     }

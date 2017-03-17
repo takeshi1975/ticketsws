@@ -26,7 +26,7 @@ public class Voucher {
         InformeCrearRespuesta informeCrearRespuesta = new InformeCrearRespuesta();
         String url = url_ticketsPDF  + "?orderCode="+orderCode;
 
-        OrderTickets orderTickets = oneboxTickets.query(url, "GET", OrderTickets.class, null);
+        OrderTickets orderTickets = oneboxTickets.query(url, "GET", "XML", OrderTickets.class, null);
         for (Ticket ticket : orderTickets.getTickets().getTicket()){
             informeCrearRespuesta.getInfpdf().add(ticket.getUrl());
 

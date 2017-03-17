@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +41,6 @@ public class TicketController {
 
 	@Autowired
 	private QueryService<SessionInfo> oneboxEngineInfo;
-
 	
 	@Autowired
 	private Availability availability; 
@@ -70,7 +69,8 @@ public class TicketController {
 	 */
 	@Transactional
 	@RequestMapping(value="/load",method=RequestMethod.GET, produces=MediaType.APPLICATION_XML_VALUE)
-	public Response load(){			
+	public Response load(){		
+		loader.erase(); // Eliminamos cualquier elemento previo.
 		return loader.load();
 	}			
 		
@@ -105,7 +105,7 @@ public class TicketController {
 	@RequestMapping(value="/detail/{modId}/{fecha}", method=RequestMethod.GET, produces=MediaType.APPLICATION_XML_VALUE)
 	public boolean detail(@PathVariable String modId, int nclientes, @PathVariable Date fecha){
 		log.info("Comprobación de disponibilidad");
-		SessionInfo sessionInfo = oneboxEngineInfo.query(String.format(urlInfo, modId, fecha), "GET", SessionInfo.class);
+		SessionInfo sessionInfo = oneboxEngineInfo.query(String.format(urlInfo, modId, fecha), "GET","xml", SessionInfo.class,null);
 		int cupo = sessionInfo.getAvailabilityInfo().getTotal()-sessionInfo.getAvailabilityInfo().getAvailable();
 		return cupo>nclientes;		
 	}
@@ -117,22 +117,27 @@ public class TicketController {
 	 * @param fecha2 Fecha de final del evento
 	 * @return
 	 */
-	@RequestMapping("/availevent/idevent/{idEvent}/from/{fecha1}/to/{fecha2}")
+	@RequestMapping(value="/availevent/idevent/{idEvent}/from/{fecha1}/to/{fecha2}",method=RequestMethod.GET, produces=MediaType.APPLICATION_XML_VALUE)
 	public DisponibilidadGeneralRespuesta availEvent(@PathVariable String idEvent, @PathVariable String fecha1, @PathVariable String fecha2){
 		return availability.availabilityTicket(idEvent, fecha1, fecha2);
-
 	}
 
-
-	@RequestMapping(value = "/purchase", method = RequestMethod.POST)
-	public ReservaCerrarRespuesta purchase(@ModelAttribute Purchase purchase){
+	
+	/**
+	 *  Juanjo:
+	 *  Cambio la anotación del parámetro a RequestBody (con la de modelo no funcionaba) 
+	 */	
+	@RequestMapping(value = "/purchase", method = RequestMethod.POST, produces=MediaType.APPLICATION_XML_VALUE)
+	public ReservaCerrarRespuesta purchase(@RequestBody Purchase purchase){
+		if (book==null)
+			log.warn("No se ha inicializado el objeto book");
 		return book.book(purchase);
-
 	}
 
-	@RequestMapping(value ="/voucher/orderCode/{orderCode}")
+	@RequestMapping(value ="/voucher/orderCode/{orderCode}", method=RequestMethod.POST, produces=MediaType.APPLICATION_XML_VALUE)
 	public InformeCrearRespuesta  ticketsPdf(@PathVariable String orderCode){
 		return voucher.getTicketsPdf(orderCode);
 	}
+		
 	
 }

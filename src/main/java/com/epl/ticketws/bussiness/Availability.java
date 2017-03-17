@@ -34,7 +34,7 @@ public class Availability {
 
         String url = url_dispo + "?endDate="+fecfin+"&eventType=ACTIVITY&eventType=EVENT&startDate="+fecini;
 
-        EventsSearch eventsSearch = oneboxDispo.query(url, "GET", EventsSearch.class, null);
+        EventsSearch eventsSearch = oneboxDispo.query(url, "GET", "XML",EventsSearch.class, null);
         Optional<EventSearchInfo> eventSearchInfo = filterTicketsById(idEvent,eventsSearch );
         if (eventSearchInfo.isPresent()) {
             loadTickets(dgr,eventSearchInfo.get());
@@ -44,12 +44,11 @@ public class Availability {
 
     }
 
-    private Optional<EventSearchInfo> filterTicketsById( String idEvent,   EventsSearch eventsSearch ){
-
+    private Optional<EventSearchInfo> filterTicketsById( String idEvent, EventsSearch eventsSearch ){
         return eventsSearch.getEventSearchInfo().stream().filter(e -> e.getId() == Integer.parseInt(idEvent)).findFirst();
     }
 
-    private void loadTickets(        DisponibilidadGeneralRespuesta dgr ,    EventSearchInfo eventSearchInfo ){
+    private void loadTickets( DisponibilidadGeneralRespuesta dgr, EventSearchInfo eventSearchInfo ){
         Infgen infgen = new Infgen();
         infgen.setCoddiv("EUR");
         infgen.setCupest("DS");

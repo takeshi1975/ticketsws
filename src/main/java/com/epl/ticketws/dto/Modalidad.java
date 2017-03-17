@@ -8,10 +8,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
 
 @Entity
+@Table(name="ONEBOX_MODALIDAD")
 public class Modalidad implements Serializable{
 	
 	private static final long serialVersionUID = 5063512548876010364L;

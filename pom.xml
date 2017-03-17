@@ -56,14 +56,7 @@
    			<groupId>org.hibernate</groupId>
    			<artifactId>hibernate-validator</artifactId>
    			<version>5.4.0.Final</version>
-		</dependency>	
-		
-		<dependency><!--  Postgres -->
-    		<groupId>org.postgresql</groupId>
-    		<artifactId>postgresql</artifactId>
-    		<version>42.0.0</version>
-		</dependency>
-		
+		</dependency>							
 		
 		<dependency><!--  Base de datos de test  -->
 	    	<groupId>com.h2database</groupId>
@@ -103,11 +96,27 @@
     		  	</exclusion>
    			</exclusions>
 		</dependency>
+		
 		<dependency>
 			<groupId>es.oneboxtm</groupId>
 			<artifactId>oneboxtm</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		
+		<!--  DB Oracle -->
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc7</artifactId>
+			<version>12.0.0</version>
+		</dependency>
+		
+		<!--DB Postgres-->
+		<dependency>
+    		<groupId>org.postgresql</groupId>
+    		<artifactId>postgresql</artifactId>
+    		<version>42.0.0</version>
+		</dependency> 
+		
 	</dependencies>
 
 	<build>
