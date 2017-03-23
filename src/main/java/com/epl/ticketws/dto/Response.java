@@ -12,9 +12,26 @@ public class Response {
 	private String result;		
 	private String errorMsg;
 	private String time;
-	
+			
 	public Response(String result) {
 		setResult(result);
+	}
+	
+	public boolean isOK(){
+		return result.equals("OK");
+	}
+	
+	public static Response createResponse(String ex){
+		Response response = new Response("KO");
+		response.setErrorMsg(ex.toString());
+		response.setTime(new Date());
+		return response;
+	}
+	
+	public static Response createErrorResponse(String ex){
+		Response response = new Response("OK");
+		response.setTime(new Date());
+		return response;
 	}
 	
 	public String getResult() {

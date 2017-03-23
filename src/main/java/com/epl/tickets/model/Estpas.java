@@ -8,8 +8,10 @@
 
 package com.epl.tickets.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -45,9 +47,10 @@ import javax.xml.bind.annotation.XmlType;
     "impcom"
 })
 @XmlRootElement(name = "estpas")
-public class Estpas {
+public class Estpas implements Serializable{
 
-    @XmlElement(required = true)
+	private static final long serialVersionUID = 1235864780830499433L;
+	@XmlElement(required = true)
     protected BigInteger pasid;
     @XmlElement(required = true)
     protected BigInteger impnoc;

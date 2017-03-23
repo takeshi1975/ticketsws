@@ -28,7 +28,7 @@ public class TestInformacion {
 	
 	@Test
 	public void testInformacion() {
-		logger.info("Se va a realizar un test de purchase");
+		logger.info("Se va a realizar un test de información de ventas");
 		Purchase purchase = new Purchase();
 		purchase.setCountryCode("ES");
 		purchase.setCountrySubdivisionCode(null);

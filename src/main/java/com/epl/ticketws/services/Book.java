@@ -1,4 +1,4 @@
-package com.epl.ticketws.bussiness;
+package com.epl.ticketws.services;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -15,7 +15,6 @@ import com.epl.tickets.model.Estsmo;
 import com.epl.tickets.model.Purchase;
 import com.epl.tickets.model.ReservaCerrarRespuesta;
 import com.epl.tickets.model.Resser;
-import com.epl.ticketws.services.QueryService;
 
 import es.oneboxtm.ns.purchase.order.OrderDetails;
 import es.oneboxtm.ns.purchase.order.OrderItem;

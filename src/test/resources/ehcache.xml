@@ -5,14 +5,14 @@
 
   <service>
     <jsr107:defaults>
-      <jsr107:cache name="people" template="heap-cache"/> 
+      <jsr107:cache name="oneboxCache" template="heap-cache"/>      
     </jsr107:defaults>
   </service>
 
   <cache-template name="heap-cache">
-    <listeners>    
+    <!-- listeners>    
       <listener>
-        <class>org.terracotta.ehcache.EventLogger</class>
+        <class>com.epl.services.CacheEventLogger</class>
         <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
         <event-ordering-mode>UNORDERED</event-ordering-mode>
         <events-to-fire-on>CREATED</events-to-fire-on> 
@@ -21,11 +21,10 @@
         <events-to-fire-on>REMOVED</events-to-fire-on> 
         <events-to-fire-on>EVICTED</events-to-fire-on> 
       </listener>
-    </listeners>
+    </listeners -->
     <resources>
       <heap unit="entries">2000</heap> 
-      <offheap unit="MB">100</offheap>
-      <disk unit="MB">500</disk> 
+      <offheap unit="MB">100</offheap> 
     </resources>
   </cache-template>
 </config>

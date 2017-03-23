@@ -8,10 +8,12 @@
 
 package com.epl.tickets.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -68,9 +70,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "resser"
 })
 @XmlRootElement(name = "ReservaCerrarRespuesta")
-public class ReservaCerrarRespuesta {
+public class ReservaCerrarRespuesta implements Serializable{
 
-    @XmlElement(required = true)
+	private static final long serialVersionUID = -6002793250562143441L;
+	@XmlElement(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "NCName")
     protected String codtou;

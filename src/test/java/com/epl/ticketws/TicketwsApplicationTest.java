@@ -18,21 +18,11 @@ public class TicketwsApplicationTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
 	private static final Logger logger = Logger.getLogger(TicketwsApplicationTest.class);	
-	
-	//	@Before
-	//	public void load(){
-	//		logger.info("-----------------------------------------------");
-	//		logger.info("Se va a realizar la carga de tickets");
-	//		String json = this.restTemplate.getForObject("/tickets/load", String.class );
-	//		logger.info(json);
-	//		logger.info("Se ha realizado la carga de tickets");
-	//		try{ Thread.sleep(5000);} catch(Exception ex){};
-	//	}
-
+		
 	// Comprueba una disponibilidad general de producto.
 	@Test
 	public void testAvail() {
-		// this.restTemplate.getForObject("/tickets/load", String.class);
+		this.restTemplate.getForObject("/tickets/load", String.class);
 		logger.info("Se va a pedir disponibilidad");
 		String json = this.restTemplate.getForObject("/tickets/avail", String.class );		
 		logger.info(json);

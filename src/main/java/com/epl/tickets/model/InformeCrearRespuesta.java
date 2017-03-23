@@ -1,8 +1,14 @@
 package com.epl.tickets.model;
 
-import javax.xml.bind.annotation.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * Created by gcortes on 14/03/2017.
@@ -14,9 +20,10 @@ import java.util.List;
         "tiperr"
 })
 @XmlRootElement(name = "InformeCrearRespuesta")
-public class InformeCrearRespuesta {
-
-    @XmlElement(required = true)
+public class InformeCrearRespuesta implements Serializable	{
+		
+	private static final long serialVersionUID = 1L;
+	@XmlElement(required = true)
     protected String ideses;
     @XmlElement(name="")
     protected List<String> infpdf;

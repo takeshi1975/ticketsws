@@ -8,9 +8,11 @@
 
 package com.epl.tickets.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -32,9 +34,10 @@ import javax.xml.bind.annotation.XmlType;
     "infsmo"
 })
 @XmlRootElement(name = "infgen")
-public class Infgen {
-
-    @XmlElement(required = true)
+public class Infgen implements Serializable{
+    
+	private static final long serialVersionUID = -9042709422097766743L;
+	@XmlElement(required = true)
     protected String codtse;
     @XmlElement(required = true)
     protected String nomser;

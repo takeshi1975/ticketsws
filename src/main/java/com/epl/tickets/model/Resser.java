@@ -8,10 +8,12 @@
 
 package com.epl.tickets.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -64,9 +66,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "estsmo"
 })
 @XmlRootElement(name = "resser")
-public class Resser {
+public class Resser implements Serializable {
 
-    @XmlElement(required = true)
+	private static final long serialVersionUID = -6945818291574926271L;
+	@XmlElement(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "NCName")
     protected String codage;

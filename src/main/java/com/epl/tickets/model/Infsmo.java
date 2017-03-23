@@ -8,6 +8,8 @@
 
 package com.epl.tickets.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -66,9 +68,10 @@ import javax.xml.bind.annotation.XmlType;
     "porage"
 })
 @XmlRootElement(name = "infsmo")
-public class Infsmo {
+public class Infsmo implements Serializable{
 
-    @XmlElement(required = true)
+	private static final long serialVersionUID = 2429900188481446871L;
+	@XmlElement(required = true)
     protected String codcon;
     @XmlElement(required = true)
     protected String codtrf;

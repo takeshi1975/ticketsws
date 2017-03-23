@@ -1,4 +1,4 @@
-package com.epl.ticketws.bussiness;
+package com.epl.ticketws.services;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.epl.tickets.model.InformeCrearRespuesta;
-import com.epl.ticketws.services.QueryService;
 
 import es.oneboxtm.ns.purchase.order.OrderTickets;
 import es.oneboxtm.ns.purchase.order.Ticket;

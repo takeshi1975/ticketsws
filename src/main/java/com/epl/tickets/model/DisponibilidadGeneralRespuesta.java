@@ -8,6 +8,7 @@
 
 package com.epl.tickets.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
-
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "ideses",
@@ -26,15 +26,27 @@ import javax.xml.bind.annotation.XmlType;
     "tiperr"
 })
 @XmlRootElement(name = "DisponibilidadGeneralRespuesta")
-public class DisponibilidadGeneralRespuesta {
+public class DisponibilidadGeneralRespuesta implements Serializable{
 
-    @XmlElement(required = true)
+    
+	private static final long serialVersionUID = 8931387599506451122L;
+	@XmlElement(required = true)
     protected String ideses;
     @XmlElement(name="")
     protected List<Infgen> infgen;
     @XmlElement(required = true)
     protected String tiperr;
 
+    public DisponibilidadGeneralRespuesta() {
+		// TODO Auto-generated constructor stub
+	}
+    
+    public static DisponibilidadGeneralRespuesta createWithError(String error){
+    	DisponibilidadGeneralRespuesta dgr = new DisponibilidadGeneralRespuesta();
+    	dgr.setTiperr(error);
+    	return dgr;
+    }
+    
     /**
      * Obtiene el valor de la propiedad ideses.
      * 

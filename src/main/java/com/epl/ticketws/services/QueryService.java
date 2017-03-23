@@ -1,10 +1,22 @@
 package com.epl.ticketws.services;
 
 import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.security.SignatureException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -19,15 +31,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import com.epl.onebox.model.ActivityTicketTypeAvailability;
-import com.epl.onebox.model.BasicInfoSessionSearchInfo;
-import com.epl.onebox.model.EventSearchInfo;
-import com.epl.onebox.model.EventsSearch;
 
 
 @Service
@@ -56,13 +62,8 @@ public class QueryService<T> {
     private static final String AUTHORIZATION_HEADER_HMAC_PREFIX = "OB_HMAC ";
     
     public T query(String url, String method, String accept, Class<T> rc, Map<String, String> parameters) {
-        
-        Exception ex = null;
-       
+             
         try {
-
-
-
             URI uri = new URL(url).toURI();
             long timestamp = new Date().getTime();
 
@@ -106,8 +107,6 @@ public class QueryService<T> {
                 entity = new HttpEntity<String>(headers);
             }
 
-//            RestTemplate restTemplate = new RestTemplate();
-
             RestTemplate restTemplate  = new RestTemplate(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
             List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>();
             interceptors.add(new LoggingRequestInterceptor());
@@ -132,24 +131,18 @@ public class QueryService<T> {
             return response.getBody();	            
         } catch (HttpClientErrorException e) {
             logger.error(e.getMessage());
-            ex = e;
             e.printStackTrace();            
         } catch (MalformedURLException e) {
             logger.error(e.getMessage());
-            ex = e;
-            e.printStackTrace();
-            
+            e.printStackTrace();           
         } catch (SignatureException e) {
             logger.error(e.getMessage());
-            ex = e;
             e.printStackTrace();            
         } catch (URISyntaxException e) {
             logger.error(e.getMessage());
-            ex = e;
             e.printStackTrace();            
         } catch (Exception e) {
             logger.error(e.getMessage());
-            ex = e;
             e.printStackTrace();            
         }             
         return null;

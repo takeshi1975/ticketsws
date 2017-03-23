@@ -15,11 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class TestAvailWithDates {
+@EnableCaching
+public class TestAvailWithDates{
 
 	@Autowired
 	private TestRestTemplate restTemplate;
@@ -41,7 +43,9 @@ public class TestAvailWithDates {
 	@Test
 	public void testAvailWithDates() {
 		logger.info("Se pide disponibilidad por fechas");
+		this.restTemplate.getForObject("/tickets/load", String.class); // Cargamos los datos
 		String url = "/tickets/avail/from/%s/to/%s";
+							   
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 		Date randomDate = getRandomDate();
 		url = String.format(url, df.format(randomDate), df.format(addDate(randomDate, 1 + (int) Math.random() * 5)));
@@ -49,4 +53,6 @@ public class TestAvailWithDates {
 		logger.info(json);
 		assertThat(json).contains("<infgen>");
 	}
+
+	
 }
