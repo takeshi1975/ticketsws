@@ -19,7 +19,7 @@ public interface ServicioRepo extends CrudRepository<Servicio, Long> {
 	/** 
 	 * Para que el compilador reconozca los parametros hay que marcar una opción en Window->Preferences->Java->Compiler
 	 ***/	 
-	@Query("select s from Servicio s where not (s.finEvento<:fecha1 or s.inicioEvento>:fecha2)")
+	@Query("select s from Servicio s where not (s.inicioEvento>=:fecha1 or s.finEvento<=:fecha2)")
 	public Iterable<Servicio> findByDates(Date fecha1, Date fecha2);
 	public void deleteAll();
 }
