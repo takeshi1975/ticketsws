@@ -32,15 +32,15 @@
 		</dependency>
 		
 		<dependency><!-- Tomcat -->
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-        </dependency>
+        	    <groupId>org.springframework.boot</groupId>
+            	    <artifactId>spring-boot-starter-tomcat</artifactId>
+            	    <scope>provided</scope>
+	        </dependency>
 
 		<dependency><!--  JPA -->
-        	<groupId>org.springframework.boot</groupId>
-        	<artifactId>spring-boot-starter-data-jpa</artifactId>
-    	</dependency>
+        		<groupId>org.springframework.boot</groupId>
+        		<artifactId>spring-boot-starter-data-jpa</artifactId>
+	    	</dependency>
 
 		<dependency><!--  Test -->
 			<groupId>org.springframework.boot</groupId>
@@ -49,9 +49,9 @@
 		</dependency>
 		
 		<dependency><!-- Cache -->
-      		<groupId>org.springframework.boot</groupId>
-      		<artifactId>spring-boot-starter-cache</artifactId> 
-    	</dependency>
+	      		<groupId>org.springframework.boot</groupId>
+      			<artifactId>spring-boot-starter-cache</artifactId> 
+ 	   	</dependency>
 		
 		<dependency><!--  Jackson -->
 			<groupId>com.fasterxml.jackson.dataformat</groupId>

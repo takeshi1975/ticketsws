@@ -43,7 +43,7 @@ public class TestAvailWithDates{
 	@Test
 	public void testAvailWithDates() {
 		logger.info("Se pide disponibilidad por fechas");
-		this.restTemplate.getForObject("/tickets/load", String.class); // Cargamos los datos
+		//this.restTemplate.getForObject("/tickets/load", String.class); // Cargamos los datos
 		String url = "/tickets/avail/from/%s/to/%s";
 							   
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
@@ -52,6 +52,7 @@ public class TestAvailWithDates{
 		String json = this.restTemplate.getForObject(url, String.class);
 		logger.info(json);
 		assertThat(json).contains("<infgen>");
+		logger.info("Fin de la prueba");
 	}
 
 	
