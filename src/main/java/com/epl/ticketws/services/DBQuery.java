@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.cache.annotation.CacheDefaults;
-import javax.cache.annotation.CacheResult;
 import javax.cache.annotation.CacheRemoveAll;
-
+import javax.cache.annotation.CacheResult;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
@@ -132,7 +130,11 @@ public class DBQuery {
 				inicio = fin;
 				fin = tmp;
 			}			
-			servicios = servicioRepo.findByDates(inicio,fin);			
+			servicios = servicioRepo.findByDates(inicio,fin);	
+			List<Servicio> lstServicios = (List<Servicio>)servicios;
+			if (lstServicios.size()>=0){
+				log.info("SIZE-->"+lstServicios.size());
+			}			
 		}catch(Exception ex){
 			log.error("Error obteniendo la disponibilidad: "+ex.toString());
 			errorRepo.handleError("Error obteniendo la disponibilidad", ex);
