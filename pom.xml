@@ -7,7 +7,6 @@
 	<artifactId>ticketws</artifactId>
 	<version>0.9.5</version>
 	<packaging>war</packaging>
-
 	<name>ticketws</name>
 	<description>Demo project for Spring Boot</description>
 
@@ -22,7 +21,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-	</properties>
+	   	<maven.compiler.source>1.8</maven.compiler.source>
+    	<maven.compiler.target>1.8</maven.compiler.target>
+  	</properties>
+	
+	
 
 	<dependencies>
 	

@@ -48,7 +48,7 @@ public class DBQuery {
 	private int loadedModality = 0;
 	private int loadedTicket = 0;
 	private List<String> errors = new ArrayList<String>();
-	private Logger log = Logger.getLogger(TicketController.class);
+	private Logger log = Logger.getLogger(DBQuery.class);
 	private final String ERROR_DISPO ="No se ha podido obtener disponibilidad. Consulte los logs";
 	
 	@Value("${app.onebox.url.dispo}")
@@ -130,13 +130,13 @@ public class DBQuery {
 				inicio = fin;
 				fin = tmp;
 			}			
-			servicios = servicioRepo.findByDates(inicio,fin);	
+			servicios = servicioRepo.findByDates(inicio,fin);			 
 			List<Servicio> lstServicios = (List<Servicio>)servicios;
-			if (lstServicios.size()>=0){
+			if (lstServicios!=null){
 				log.info("SIZE-->"+lstServicios.size());
 			}			
 		}catch(Exception ex){
-			log.error("Error obteniendo la disponibilidad: "+ex.toString());
+			log.error("Error obteniendo la disponibilidad:", ex);
 			errorRepo.handleError("Error obteniendo la disponibilidad", ex);
 		}
 		return getXMLResponse(servicios).orElse(DisponibilidadGeneralRespuesta.createWithError(ERROR_DISPO));
@@ -171,7 +171,7 @@ public class DBQuery {
 				ticketRepo.save(ticket);
 				loadedTicket++;
 			} catch (Exception ex) {				
-				log.error("Ticked failed " + ticket, ex);
+				log.error("Ticked failed "+ ticket, ex);
 				errors.add(ex.toString());
 				errorTicket++;
 			}
