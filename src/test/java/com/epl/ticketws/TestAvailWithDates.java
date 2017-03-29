@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -18,9 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.epl.ticketws.dto.OneboxTest;
-import com.epl.ticketws.repo.OneboxTestRepo;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -42,21 +38,7 @@ public class TestAvailWithDates{
 		cal.setTime(date);
 		cal.add(Calendar.DAY_OF_MONTH, n);
 		return cal.getTime();	
-	}
-	
-	@Autowired
-	OneboxTestRepo repo;
-	
-	@Test
-	public void doOneboxTest(){
-		logger.info("Se prueba la función de fechas");		
-		repo.save(new OneboxTest(2,new Date()));
-		repo.save(new OneboxTest(3,new Date()));
-		repo.save(new OneboxTest(4,new Date()));
-		
-		List<OneboxTest> lista = (List<OneboxTest>)repo.doTestQuery();
-		logger.info("*** SIZE --->"+ lista.size());
-	}
+	}	
 
 	@Test
 	public void testAvailWithDates() {
