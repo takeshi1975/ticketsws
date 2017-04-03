@@ -89,12 +89,12 @@ public class Availability {
 					}
 					infsmo.setImpcom(price);
 					infsmo.setCupest(available);
-					infgen.getInfsmo().add(infsmo);
+					infgen.getInfsmos().add(infsmo);
 				}
 			}
 
 		}
-		dgr.getInfgen().add(infgen);
+		dgr.getInfgens().add(infgen);
 
 	}	
 

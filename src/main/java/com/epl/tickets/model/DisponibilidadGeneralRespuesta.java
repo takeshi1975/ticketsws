@@ -32,8 +32,8 @@ public class DisponibilidadGeneralRespuesta implements Serializable{
 	private static final long serialVersionUID = 8931387599506451122L;
 	@XmlElement(required = true)
     protected String ideses;
-    @XmlElement(name="")
-    protected List<Infgen> infgen;
+        
+    protected List<Infgen> infgens;
     @XmlElement(required = true)
     protected String tiperr;
 
@@ -93,10 +93,10 @@ public class DisponibilidadGeneralRespuesta implements Serializable{
      * 
      * 
      */
-    public List<Infgen> getInfgen() {        
-        if (infgen==null)
-        	infgen = new ArrayList<Infgen>();
-        return infgen;        	
+    public List<Infgen> getInfgens() {        
+        if (infgens==null)
+        	infgens = new ArrayList<Infgen>();
+        return infgens;        	
     }
 
     /**

@@ -20,6 +20,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -52,8 +54,11 @@ public class Infgen implements Serializable{
     protected String cupest;
     @XmlElement(required = true)
     protected Prozge prozge;
+    
+    
     @XmlElement(required = true)
-    protected List<Infsmo> infsmo;
+    @XStreamImplicit
+    protected List<Infsmo> infsmos;
     @XmlAttribute(name = "id", required = true)
     protected int id;
 
@@ -263,11 +268,11 @@ public class Infgen implements Serializable{
      * 
      * 
      */
-    public List<Infsmo> getInfsmo() {
-        if (infsmo == null) {
-            infsmo = new ArrayList<Infsmo>();
+    public List<Infsmo> getInfsmos() {
+        if (infsmos == null) {
+            infsmos = new ArrayList<Infsmo>();
         }
-        return this.infsmo;
+        return this.infsmos;
     }
 
     /**

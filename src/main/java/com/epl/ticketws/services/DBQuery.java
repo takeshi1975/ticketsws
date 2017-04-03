@@ -99,10 +99,10 @@ public class DBQuery {
 					infsmo.setNinmax(ticket.getCaracteristica().contains("Junior")?1:0);					
 					infsmo.setRefdis((int)ticket.getTicketPK().getId());
 					infsmo.setImpcom(ticket.getPrecio());
-					infgen.getInfsmo().add(infsmo);
+					infgen.getInfsmos().add(infsmo);
 				}												 
 			}
-			dgr.getInfgen().add(infgen);			
+			dgr.getInfgens().add(infgen);			
 		}		
 		return  (n>0)?Optional.of(dgr):Optional.ofNullable(null);		
 	}
