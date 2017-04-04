@@ -39,10 +39,7 @@ import com.epl.ticketws.services.Voucher;
 public class TicketController {
 
 	private static final Logger log = Logger.getLogger(TicketController.class);
-	private final String ENCODING="UTF-8";
-	
-	@Value("${app.onebox.url.info}")
-	private String urlInfo;
+	private final String ENCODING="UTF-8";		
 
 	@Autowired
 	private QueryService<SessionInfo> oneboxEngineInfo;
@@ -151,7 +148,7 @@ public class TicketController {
 	 * @param caracteristica
 	 *            AD, NI.
 	 * @return
-	 */
+	 
 	@RequestMapping(value = "/detail/{modId}/{fecha}", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
 	public boolean detail(@PathVariable String modId, int nclientes, @PathVariable Date fecha) {
 		log.info("Comprobación de disponibilidad");
@@ -160,23 +157,19 @@ public class TicketController {
 		int cupo = sessionInfo.getAvailabilityInfo().getTotal() - sessionInfo.getAvailabilityInfo().getAvailable();
 		return cupo > nclientes;
 	}
-
+*/
 	/**
 	 * Esta consulta también devuelve la disponibilidad "real" (no cacheada) de
 	 * un producto concreto
 	 * 
 	 * @param idEvent
-	 *            Código del producto
-	 * @param fecha1
-	 *            Fecha de inicio evento
-	 * @param fecha2
-	 *            Fecha de final del evento
-	 * @return
+	 *            Código del producto/modalidad.
+	 * 
 	 */
-	@RequestMapping(value = "/availevent/idevent/{idEvent}/from/{fecha1}/to/{fecha2}", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
-	public DisponibilidadGeneralRespuesta availEvent(@PathVariable String idEvent, @PathVariable String fecha1,
-			@PathVariable String fecha2) {
-		return availability.availabilityTicket(idEvent, fecha1, fecha2).orElse(
+	@RequestMapping(value = "/availevent/idevent/{idEvent}", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
+	public DisponibilidadGeneralRespuesta availEvent(@PathVariable String idEvent) {
+		log.info("------- avail Event --------");
+		return availability.availabilityTicket(idEvent).orElse(
 				DisponibilidadGeneralRespuesta.createWithError("No se puede evaluar la disponibilidad del evento"));
 	}
 

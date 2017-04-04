@@ -91,8 +91,8 @@ public class DBQuery {
 				Iterable <Ticket> tickets = ticketRepo.findByModalidadId(modalidad.getId());
 				for (Ticket ticket:tickets){
 					Infsmo infsmo = new Infsmo();
-					infsmo.setCodsmo(String.valueOf(modalidad.getId()));
-					infsmo.setCodcon(modalidad.getModalidad());
+					infsmo.setCodsmo(modalidad.getId()+"#"+modalidad.getModalidad());
+					infsmo.setCodcon(modalidad.getId()+"#"+ticket.getTicketPK().getId());  
 					infsmo.setCodcha(ticket.getCaracteristica());
 					infsmo.setCupest("DS");
 					infsmo.setAdlmax(ticket.getCaracteristica().contains("Adulto")?1:0);					

@@ -21,7 +21,7 @@ public class AppConfig {
 	public XStreamMarshaller getXStreamMarshaller() {
 		Map<String, Class<?>> aliases = new HashMap<String, Class<? extends Object>>();
 		aliases.put("DisponibilidadGeneralRespuesta",DisponibilidadGeneralRespuesta.class);
-		aliases.put("infogen", Infgen.class);
+		aliases.put("infgen", Infgen.class);
 		aliases.put("infsmo", Infsmo.class);
 		XStreamMarshaller xstreamMarshaller = new XStreamMarshaller();
 		xstreamMarshaller.setAliases(aliases);

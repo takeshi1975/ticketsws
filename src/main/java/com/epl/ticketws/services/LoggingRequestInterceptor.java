@@ -47,7 +47,16 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
         log.info("Status code  : " + response.getStatusCode());
         log.info("Status text  : "+ response.getStatusText());
         log.info("Headers      : "+ response.getHeaders());
-        log.info("Response body: " + inputStringBuilder.toString().substring(0,100));
+        int i =0, j=0;
+        while (j <inputStringBuilder.toString().length()){
+        	j =  inputStringBuilder.toString().length()-i;
+        	if (j>150)
+        		j=i+150;
+        	else 
+        		j+=i;
+        	log.info("Response body: " + inputStringBuilder.toString().substring(i,j));
+        	i = j;
+        }
         log.info("=======================response end=================================================");
     }
 

@@ -1,5 +1,8 @@
 package com.epl.ticketws.services;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
@@ -23,33 +26,32 @@ import com.epl.ticketws.repo.ErrorRepo;
 @Component
 public class Availability {
 
-	@Value("${app.onebox.url.search}")
-	private String url_dispo = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/events/search";	
-	
+	@Value("${app.onebox.url.info}")
+	private String urlInfo;
+
 	@Autowired
 	private QueryService<EventsSearch> oneboxDispo;
 	private static final Logger log = Logger.getLogger(Availability.class);
-	
+
 	@Autowired
 	private ErrorRepo errorRepo;
-	
-	public Optional<DisponibilidadGeneralRespuesta> availabilityTicket(String idEvent, String fecini, String fecfin) {
 
+	public Optional<DisponibilidadGeneralRespuesta> availabilityTicket(String idEvent) {		
 		DisponibilidadGeneralRespuesta dgr = new DisponibilidadGeneralRespuesta();
+		try {						
+			String url = String.format(urlInfo, idEvent);
 
-		String url = url_dispo + "?endDate=" + fecfin + "&eventType=ACTIVITY&eventType=EVENT&startDate=" + fecini;
-		try{
 			EventsSearch eventsSearch = oneboxDispo.query(url, "GET", "XML", EventsSearch.class, null);
 			Optional<EventSearchInfo> eventSearchInfo = filterTicketsById(idEvent, eventsSearch);
 			if (eventSearchInfo.isPresent()) {
 				loadTickets(dgr, eventSearchInfo.get());
 			}
-		}catch(Throwable thx){
-			log.error("Error en la disponibilidad de ticket",thx);
+		} catch (Throwable thx) {
+			log.error("Error en la disponibilidad de ticket", thx);
 			errorRepo.handleError("Error en la disponibilidad de ticket", thx);
 			dgr = null;
 		}
-		return Optional.of(dgr);
+		return Optional.of(dgr); // Posible quizás necesite info de la bbdd....??? 
 	}
 
 	private Optional<EventSearchInfo> filterTicketsById(String idEvent, EventsSearch eventsSearch) {
@@ -74,13 +76,13 @@ public class Availability {
 						? String.valueOf(activityTicketTypeAvailability.getAvailabilityInfo().getAvailable()) : "DS";
 				if (!"0".equals(available)) {
 					Infsmo infsmo = new Infsmo();
-					infsmo.setCodsmo(String.valueOf(eventSearchInfo.getId()));
-					infsmo.setCodcon(sessionsSearchInfo.getRates());
+					infsmo.setCodsmo(String.valueOf(eventSearchInfo.getId())+"#"+sessionsSearchInfo.getRates());// #modalidad+#descmodalidad
+					infsmo.setCodcon(String.valueOf(eventSearchInfo.getId())+"#"+activityTicketTypeAvailability.getId()); // descripcion modalidad
 					infsmo.setCodcha(activityTicketTypeAvailability.getName().getValue());
 					infsmo.setCupest("DS");
 					infsmo.setAdlmax(activityTicketTypeAvailability.getName().getValue().contains("Adulto") ? 1 : 0);
 					infsmo.setNinmax(activityTicketTypeAvailability.getName().getValue().contains("Junior") ? 1 : 0);
-					infsmo.setRefdis(activityTicketTypeAvailability.getId());
+					infsmo.setRefdis(activityTicketTypeAvailability.getId()); // #Ticket
 					float price = Float.valueOf(
 							activityTicketTypeAvailability.getIndividualPrice().getPromotedPrice().floatValue());
 					for (Charge charge : activityTicketTypeAvailability.getIndividualPrice().getPromotedPriceCharges()
@@ -96,6 +98,6 @@ public class Availability {
 		}
 		dgr.getInfgens().add(infgen);
 
-	}	
+	}
 
 }
