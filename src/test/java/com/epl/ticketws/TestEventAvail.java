@@ -2,12 +2,6 @@ package com.epl.ticketws;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,25 +21,11 @@ public class TestEventAvail {
 	private TestRestTemplate restTemplate;
 	private static final Logger logger = Logger.getLogger(TestAvailWithDates.class);
 	
-	private Date getRandomDate() {
-		Calendar cal = new GregorianCalendar();
-		cal.set(2017, 1 + (int) (Math.random() * 11), 1 + (int) (Math.random() * 25));
-		return cal.getTime();
-	}
-
-	private Date addDate(Date date, int n) {
-		Calendar cal = new GregorianCalendar();
-		cal.setTime(date);
-		cal.add(Calendar.DAY_OF_MONTH, n);
-		return cal.getTime();	
-	}
-	
 	@Test
 	public void doTestAvail(){
 		logger.info("Se pide disponibilidad por fechas");
-		//this.restTemplate.getForObject("/tickets/load", String.class); // Cargamos los datos
-		String url = "/tickets/availevent/idevent/125400/";
-							   					
+		
+		String url = "/tickets/availevent/idevent/2880/idsession/125400/from/12-07-2017/to/14-07-2017";							   					
 		String json = this.restTemplate.getForObject(url, String.class);
 		logger.info(json.substring(0, 100));
 		assertThat(json).contains("<infgen>");

@@ -28,7 +28,7 @@ public class Modalidad implements Serializable{
 	private Date fecha;		
 	private Date inicioVenta;
 	private Date finVenta;
-	
+	private Date inicioSesion;
 	
 	@ManyToOne
 	@JoinColumn(name="servicio_id")
@@ -98,5 +98,15 @@ public class Modalidad implements Serializable{
 	public void setFinVenta(Date finVenta) {
 		this.finVenta = finVenta;
 	}
-		
+
+	public Date getInicioSesion() {
+		return inicioSesion;
+	}
+
+	public void setInicioSesion(Date inicioSesion) {
+		this.inicioSesion = inicioSesion;
+	}
+
+	
+	
 }

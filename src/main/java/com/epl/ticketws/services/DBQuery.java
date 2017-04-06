@@ -3,7 +3,9 @@ package com.epl.ticketws.services;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,13 +28,14 @@ import com.epl.onebox.model.EventsSearch;
 import com.epl.tickets.model.DisponibilidadGeneralRespuesta;
 import com.epl.tickets.model.Infgen;
 import com.epl.tickets.model.Infsmo;
-import com.epl.ticketws.controller.TicketController;
 import com.epl.ticketws.dto.Modalidad;
 import com.epl.ticketws.dto.Response;
 import com.epl.ticketws.dto.Servicio;
+import com.epl.ticketws.dto.ServicioCupo;
 import com.epl.ticketws.dto.Ticket;
 import com.epl.ticketws.repo.ErrorRepo;
 import com.epl.ticketws.repo.ModalidadRepo;
+import com.epl.ticketws.repo.ServicioCupoRepo;
 import com.epl.ticketws.repo.ServicioRepo;
 import com.epl.ticketws.repo.TicketRepo;
 
@@ -41,15 +44,16 @@ import com.epl.ticketws.repo.TicketRepo;
 @ComponentScan("com.epl.ticketws.repo")
 public class DBQuery {
 
-	private int errorService = 0;
-	private int errorModality = 0;
-	private int errorTicket = 0;
-	private int loadedService = 0;
+	private int errorService   = 0;
+	private int errorModality  = 0;
+	private int errorTicket    = 0;
+	private int loadedService  = 0;
 	private int loadedModality = 0;
-	private int loadedTicket = 0;
+	private int loadedTicket   = 0;
 	private List<String> errors = new ArrayList<String>();
 	private Logger log = Logger.getLogger(DBQuery.class);
 	private final String ERROR_DISPO ="No se ha podido obtener disponibilidad. Consulte los logs";
+	private boolean infiniteCapacity;
 	
 	@Value("${app.onebox.url.dispo}")
 	private String urlDispo;
@@ -57,6 +61,8 @@ public class DBQuery {
 	@Autowired
 	private QueryService<EventsSearch> oneboxEngineAvail;
 
+	@Autowired
+	private ServicioCupoRepo servicioCupoRepo;
 	
 	@Autowired
 	private TicketRepo ticketRepo;
@@ -66,17 +72,32 @@ public class DBQuery {
 
 	@Autowired
 	private ServicioRepo servicioRepo;
-
-	@Autowired
-	private ErrorRepo errorRepo;
 	
-	private Optional<DisponibilidadGeneralRespuesta> getXMLResponse(Iterable<Servicio> servicios, Date ... dates ){
+	
+	
+	@Autowired
+	private ErrorRepo errorRepo;	
+	
+	private DateFormat getDateFormat(){
+		DateFormat df = null;
+		try{ // For the begin session date... 
+			df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		}catch(Exception ex){
+			log.error("Error en el formato de fecha/getXMLReponse", ex);
+		}
+		return df;
+	}
+	
+	private Optional<DisponibilidadGeneralRespuesta> getXMLResponse(Iterable<Servicio> servicios, Date inicio, Date fin ){		
 		DisponibilidadGeneralRespuesta dgr = new DisponibilidadGeneralRespuesta();
 		int n  = 0;
+		DateFormat df = getDateFormat();		
 		if (servicios==null)
 			return Optional.empty();
+		
 		for (Servicio servicio:servicios){
 			n++;
+			log.info("Se procesa el servicio "+servicio.getId());
 			Infgen infgen = new Infgen();
 			infgen.setCoddiv("EUR");
 			infgen.setCupest("DS");
@@ -84,14 +105,20 @@ public class DBQuery {
 			infgen.setCodtse("ACTI");
 			infgen.setId((int)servicio.getId());
 			infgen.setNomser(servicio.getServicio());
-			infgen.setCodser((int)servicio.getId());							
-			Iterable<Modalidad> modalidades = modalidadRepo.findByServiceAndDate(servicio.getId(), new Date());
-			
+			infgen.setCodser((int)servicio.getId());
+			Iterable<Modalidad> modalidades;
+			Iterable<ServicioCupo> servicioCupos = servicioCupoRepo.findAll();
+			infiniteCapacity = false;
+			servicioCupos.forEach(p-> infiniteCapacity = infiniteCapacity || (p.getId()==servicio.getId() && p.getCupo().equals("N")) );			
+			if (infiniteCapacity) // Si no está sujeto a cupo.. 
+				modalidades = modalidadRepo.findByServiceAndDate(servicio.getId(), new Date());
+			else	
+				modalidades= modalidadRepo.findByServiceAndDate(servicio.getId(), new Date(), inicio, fin);						
 			for (Modalidad modalidad:modalidades){
 				Iterable <Ticket> tickets = ticketRepo.findByModalidadId(modalidad.getId());
 				for (Ticket ticket:tickets){
 					Infsmo infsmo = new Infsmo();
-					infsmo.setCodsmo(modalidad.getId()+"#"+modalidad.getModalidad());
+					infsmo.setCodsmo(modalidad.getId()+"#"+modalidad.getModalidad()+"#"+df.format(modalidad.getInicioSesion()));
 					infsmo.setCodcon(modalidad.getId()+"#"+ticket.getTicketPK().getId());  
 					infsmo.setCodcha(ticket.getCaracteristica());
 					infsmo.setCupest("DS");
@@ -112,34 +139,43 @@ public class DBQuery {
 	public DisponibilidadGeneralRespuesta getGeneralAvail(){
 		Iterable<Servicio> servicios = servicioRepo.findAll();
 		
-		return getXMLResponse(servicios).orElse(DisponibilidadGeneralRespuesta.createWithError(ERROR_DISPO));
+		return getXMLResponse(servicios, null, null).orElse(DisponibilidadGeneralRespuesta.createWithError(ERROR_DISPO));
 	}
-	
+
+	/**
+	 * Obtiene la disponibilidad de la base de datos filtrada por fechas.
+	 * No incluye cupo real!
+	 * @param fecha1
+	 * @param fecha2
+	 * @return Disponibilidad de la cache.
+	 */
 	@CacheResult
 	public DisponibilidadGeneralRespuesta getFilteredAvail(String fecha1, String fecha2){
 		log.info("Disponibilidad con fechas desde "+fecha1+" hasta "+fecha2);
-		Iterable<Servicio> servicios = null;
+		Date inicio = null;
+		Date fin = null;
+		List<Servicio> servicios = null;
 		try{
 			if (fecha1==null || fecha2==null)
 				return DisponibilidadGeneralRespuesta.createWithError(ERROR_DISPO);
 			DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-			Date inicio = df.parse(fecha1);
-			Date fin = df.parse(fecha2);
-			if (!inicio.before(fin)){
+			inicio = df.parse(fecha1);
+			fin = df.parse(fecha2);
+			if (!inicio.before(fin)){ // Ordena las fechas de forma coherente.
 				Date tmp = inicio;
 				inicio = fin;
 				fin = tmp;
 			}			
-			servicios = servicioRepo.findByDates(inicio,fin);			 
-			List<Servicio> lstServicios = (List<Servicio>)servicios;
-			if (lstServicios!=null){
-				log.info("SIZE-->"+lstServicios.size());
-			}			
+			fin = this.addDate(fin, 1); // Añadimos un día a la fecha de fin para que incluya la disponibilidad del último día...
+			servicios = (List<Servicio>)servicioRepo.findByDates(inicio,fin);			 			
+			if (servicios!=null)
+				log.info("SIZE-->"+servicios.size());								
+			return getXMLResponse(servicios, inicio, fin).orElse(DisponibilidadGeneralRespuesta.createWithError(ERROR_DISPO));
 		}catch(Exception ex){
 			log.error("Error obteniendo la disponibilidad:", ex);
 			errorRepo.handleError("Error obteniendo la disponibilidad", ex);
-		}
-		return getXMLResponse(servicios).orElse(DisponibilidadGeneralRespuesta.createWithError(ERROR_DISPO));
+		}		
+		return DisponibilidadGeneralRespuesta.createWithError(ERROR_DISPO);
 	}
 	
 	@CacheRemoveAll
@@ -166,7 +202,7 @@ public class DBQuery {
 																									// de
 																									// los
 																									// cargos.
-					price += charge.getValue().floatValue();
+				price += charge.getValue().floatValue();
 				ticket = new Ticket((long) at.getId(), at.getName().getValue(), price, 0, modalidad, servicio);
 				ticketRepo.save(ticket);
 				loadedTicket++;
@@ -177,21 +213,37 @@ public class DBQuery {
 			}
 		}
 	}
+	
+	private Date addDate(Date date, int days){
+		Calendar cal = new GregorianCalendar();
+		cal.setTime(date);
+		cal.add(Calendar.DAY_OF_MONTH, days);
+		return cal.getTime();
+	}
 
+	private Optional<Date> getDateFromXML(List<Datetime> fechas, String type){
+		boolean found = false;
+		int index = 0;
+		while (!found && index<fechas.size()){			
+			found = fechas.get(index++).getType().equals(type);			
+		}
+		if (found)
+			return Optional.of(fechas.get(--index).getValue().toGregorianCalendar().getTime());
+		return Optional.empty();
+	}
+	
 	private void loadModalities(EventSearchInfo esi, Servicio servicio) {
 		Modalidad modalidad = null;
 		for (BasicInfoSessionSearchInfo bissi : esi.getSessionsSearchInfo().getSessionSearchInfo()) {
 			try {
-				modalidad = new Modalidad(bissi.getId(), bissi.getRates(), servicio);
+				modalidad = new Modalidad(bissi.getId(), bissi.getRates()+"/"+bissi.getName().getValue(), servicio);
 				log.debug(" Modalidad: " + modalidad);
-				if (bissi.getDates().getDatetime().size() > 0) {
-					Datetime inicio = bissi.getDates().getDatetime().get(0);
-					modalidad.setInicioVenta(inicio.getValue().toGregorianCalendar().getTime());
-				}
-				if (bissi.getDates().getDatetime().size() > 1) {
-					Datetime finalt = bissi.getDates().getDatetime().get(1);
-					modalidad.setFinVenta(finalt.getValue().toGregorianCalendar().getTime());
-				}
+				Date beginSales = getDateFromXML(bissi.getDates().getDatetime(), "SESSION_SALES_BEGIN").orElse(null);
+				Date endSales = getDateFromXML(bissi.getDates().getDatetime(),"SESSION_SALES_END").orElse(null);
+				Date sessionBegin = getDateFromXML(bissi.getDates().getDatetime(),"SESSION_BEGIN").orElse(null);				
+				modalidad.setInicioVenta(beginSales);
+				modalidad.setFinVenta(endSales);
+				modalidad.setInicioSesion(sessionBegin);
 
 				modalidadRepo.save(modalidad);
 				loadedModality++;
@@ -203,35 +255,27 @@ public class DBQuery {
 				errors.add(ex.toString());
 			}
 		}
-	}
-
+	}	
+	
 	private void loadServices(EventsSearch eventsSearch) {
 		errorService = 0;
 		errorModality = 0;
 		errorTicket = 0;
 		loadedService = 0;
 		loadedModality = 0;
-		loadedTicket = 0;
-		Servicio servicio = null;
+		loadedTicket = 0;		
 		for (EventSearchInfo esi : eventsSearch.getEventSearchInfo()) {
 			try {
-				Datetime fechaFin = esi.getDates().getDatetime().get(1);
-				servicio = new Servicio((long) esi.getId(), esi.getTitle());
-				if (esi.getDates().getDatetime().size() >= 1) {
-					Datetime fechaInicio = esi.getDates().getDatetime().get(0);
-					servicio.setInicioEvento(fechaInicio.getValue().toGregorianCalendar().getTime());
-				}
-				if (esi.getDates().getDatetime().size() >= 2) {
-					Datetime fechaInicio = esi.getDates().getDatetime().get(1);
-					servicio.setInicioEvento(fechaInicio.getValue().toGregorianCalendar().getTime());
-				}
-				servicio.setFinEvento(fechaFin.getValue().toGregorianCalendar().getTime());
-				log.debug(" Servicio:" + servicio);
+				Servicio servicio = new Servicio(esi.getId(), esi.getTitle());
+				Date fechaInicio = getDateFromXML(esi.getDates().getDatetime(),"EVENT_BEGIN").orElse(null);
+				Date fechaFin = getDateFromXML(esi.getDates().getDatetime(),"EVENT_END").orElse(null);
+				servicio.setInicioEvento(fechaInicio);
+				servicio.setFinEvento(fechaFin);				
 				servicioRepo.save(servicio);
 				loadedService++;
 				loadModalities(esi, servicio);
 			} catch (Exception ex) {				
-				log.error("Modality failed "+ servicio, ex);
+				log.error("Service failed "+ esi.getId(), ex);
 				errors.add(ex.toString());
 				errorService++;
 			}

@@ -13,16 +13,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class TicketwsApplicationTest {
+public class TestSimpleAvail {
 	
 	@Autowired
 	private TestRestTemplate restTemplate;
-	private static final Logger logger = Logger.getLogger(TicketwsApplicationTest.class);	
+	private static final Logger logger = Logger.getLogger(TestSimpleAvail.class);	
 		
 	// Comprueba una disponibilidad general de producto.
 	@Test
 	public void testAvail() {
-		this.restTemplate.getForObject("/tickets/load", String.class);
+		//this.restTemplate.getForObject("/tickets/load", String.class);
 		logger.info("Se va a pedir disponibilidad");
 		String json = this.restTemplate.getForObject("/tickets/avail", String.class );		
 		logger.info(json);

@@ -22,7 +22,7 @@ public class TestPurchase {
 	
 	@Autowired
 	private TestRestTemplate restTemplate;
-	private static final Logger logger = Logger.getLogger(TicketwsApplicationTest.class);
+	private static final Logger logger = Logger.getLogger(TestSimpleAvail.class);
 	
 	
 	@Test

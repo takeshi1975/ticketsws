@@ -4,11 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.epl.onebox.infoser.SessionInfo;
 import com.epl.tickets.model.DisponibilidadGeneralRespuesta;
 import com.epl.tickets.model.InformeCrearRespuesta;
 import com.epl.tickets.model.Purchase;
@@ -30,7 +27,6 @@ import com.epl.ticketws.dto.Response;
 import com.epl.ticketws.services.Availability;
 import com.epl.ticketws.services.Book;
 import com.epl.ticketws.services.DBQuery;
-import com.epl.ticketws.services.QueryService;
 import com.epl.ticketws.services.Voucher;
 
 @RestController
@@ -39,10 +35,7 @@ import com.epl.ticketws.services.Voucher;
 public class TicketController {
 
 	private static final Logger log = Logger.getLogger(TicketController.class);
-	private final String ENCODING="UTF-8";		
-
-	@Autowired
-	private QueryService<SessionInfo> oneboxEngineInfo;
+	private final String ENCODING = "UTF-8";
 
 	@Autowired
 	private Availability availability;
@@ -90,12 +83,12 @@ public class TicketController {
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
 		try {
 			try {
-				OutputStreamWriter osWriter = new OutputStreamWriter(outputStream, ENCODING);				
+				OutputStreamWriter osWriter = new OutputStreamWriter(outputStream, ENCODING);
 				ctx.register(AppConfig.class);
 				ctx.refresh();
 				XStreamMarshaller xstream = ctx.getBean(XStreamMarshaller.class);
 				xstream.setEncoding(ENCODING);
-				// Perform Marshaling to Outputstream (a String...)				
+				// Perform Marshaling to Outputstream (a String...)
 				xstream.marshalWriter(dgr, osWriter);
 				log.info("Marshaling completed.");
 				return outputStream.toString();
@@ -105,7 +98,30 @@ public class TicketController {
 			}
 		} finally {
 			ctx.close();
-		}		
+		}
+	}
+
+	private String marshal(DisponibilidadGeneralRespuesta dgr) {
+		OutputStream outputStream = new ByteArrayOutputStream();
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		try {
+			try {
+				OutputStreamWriter osWriter = new OutputStreamWriter(outputStream, ENCODING);
+				ctx.register(AppConfig.class);
+				ctx.refresh();
+				XStreamMarshaller xstream = ctx.getBean(XStreamMarshaller.class);
+				xstream.setEncoding(ENCODING);
+				// Perform Marshaling to Outputstream (a String...)
+				xstream.marshalWriter(dgr, osWriter);
+				log.info("Marshaling completed.");
+				return outputStream.toString();
+			} catch (IOException ex) {
+				log.error("Error en la interpretacion del fichero de disponibilidad", ex);
+				return null;
+			}
+		} finally {
+			ctx.close();
+		}
 	}
 
 	/**
@@ -114,63 +130,39 @@ public class TicketController {
 	 * @return ResponseAvail.
 	 */
 	@RequestMapping(value = "/avail/from/{fecha1}/to/{fecha2}", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
-	public String availability(@PathVariable("fecha1") String fecha1, @PathVariable("fecha2") String fecha2) {	
+	public String availability(@PathVariable("fecha1") String fecha1, @PathVariable("fecha2") String fecha2) {
 		DisponibilidadGeneralRespuesta dgr = dbQuery.getFilteredAvail(fecha1, fecha2);
-		OutputStream outputStream = new ByteArrayOutputStream();
-		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
-		try {
-			try {
-				OutputStreamWriter osWriter = new OutputStreamWriter(outputStream, ENCODING);				
-				ctx.register(AppConfig.class);
-				ctx.refresh();
-				XStreamMarshaller xstream = ctx.getBean(XStreamMarshaller.class);
-				xstream.setEncoding(ENCODING);
-				// Perform Marshaling to Outputstream (a String...)				
-				xstream.marshalWriter(dgr, osWriter);
-				log.info("Marshaling completed.");
-				return outputStream.toString();
-			} catch (IOException ex) {
-				log.error("Error en la interpretacion del fichero de disponibilidad", ex);
-				return null;
-			}
-		} finally {
-			ctx.close();
-		}		
+		return marshal(dgr);
 	}
 
-	/**
-	 * Devuelve un XML con los datos detallados de un determinado producto a la
-	 * venta y un tipo de pasajero. El código de sesión se habrá obtenido del
-	 * apartado anterior. En esta fase de la integración se devuelve la
-	 * disponibilidad real del producto.
-	 * 
-	 * @param productId
-	 * @param caracteristica
-	 *            AD, NI.
-	 * @return
-	 
-	@RequestMapping(value = "/detail/{modId}/{fecha}", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
-	public boolean detail(@PathVariable String modId, int nclientes, @PathVariable Date fecha) {
-		log.info("Comprobación de disponibilidad");
-		SessionInfo sessionInfo = oneboxEngineInfo.query(String.format(urlInfo, modId, fecha), "GET", "xml",
-				SessionInfo.class, null);
-		int cupo = sessionInfo.getAvailabilityInfo().getTotal() - sessionInfo.getAvailabilityInfo().getAvailable();
-		return cupo > nclientes;
-	}
-*/
 	/**
 	 * Esta consulta también devuelve la disponibilidad "real" (no cacheada) de
 	 * un producto concreto
 	 * 
 	 * @param idEvent
-	 *            Código del producto/modalidad.
+	 *            Código del producto/modalidad. Llama a session/idSesson/info
 	 * 
 	 */
-	@RequestMapping(value = "/availevent/idevent/{idEvent}", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
-	public DisponibilidadGeneralRespuesta availEvent(@PathVariable String idEvent) {
-		log.info("------- avail Event --------");
-		return availability.availabilityTicket(idEvent).orElse(
+	@RequestMapping(value = "/availsession/idsession/{idSession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
+	public String availSession(@PathVariable String idSession) {
+		log.info("------- avail Session --------");
+		int idModalidad = Integer.valueOf(idSession);
+		DisponibilidadGeneralRespuesta dgr = availability.sessionInfo(idModalidad).orElse(
+				DisponibilidadGeneralRespuesta.createWithError("No se puede evaluar la disponibilidad de la sesion"));
+		return marshal(dgr);
+	}
+
+	/**
+	 * Esta consulta llama a disponibilidad con fechas...?
+	 */
+	@RequestMapping(value = "/availevent/idevent/{idEvent}/idsession/{idSession}", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
+	public String availEvent(@PathVariable String idEvent, @PathVariable String idSession) {
+		log.info("--------- avail Event ------------");
+		int idServicio = Integer.valueOf(idEvent);
+		int idModalidad = Integer.valueOf(idSession);
+		DisponibilidadGeneralRespuesta dgr = availability.eventInfo(idServicio, idModalidad).orElse(
 				DisponibilidadGeneralRespuesta.createWithError("No se puede evaluar la disponibilidad del evento"));
+		return marshal(dgr);
 	}
 
 	/**
