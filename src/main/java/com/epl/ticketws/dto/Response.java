@@ -13,6 +13,10 @@ public class Response {
 	private String errorMsg;
 	private String time;
 			
+	public Response(){
+		// Constructor sin argumentos para JAXB
+	}
+	
 	public Response(String result) {
 		setResult(result);
 	}

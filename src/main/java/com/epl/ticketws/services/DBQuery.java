@@ -235,9 +235,9 @@ public class DBQuery {
 	private void loadModalities(EventSearchInfo esi, Servicio servicio) {
 		Modalidad modalidad = null;
 		for (BasicInfoSessionSearchInfo bissi : esi.getSessionsSearchInfo().getSessionSearchInfo()) {
-			try {
+			try {								
 				modalidad = new Modalidad(bissi.getId(), bissi.getRates()+"/"+bissi.getName().getValue(), servicio);
-				log.debug(" Modalidad: " + modalidad);
+				log.debug("----- Modalidad: " + modalidad);
 				Date beginSales = getDateFromXML(bissi.getDates().getDatetime(), "SESSION_SALES_BEGIN").orElse(null);
 				Date endSales = getDateFromXML(bissi.getDates().getDatetime(),"SESSION_SALES_END").orElse(null);
 				Date sessionBegin = getDateFromXML(bissi.getDates().getDatetime(),"SESSION_BEGIN").orElse(null);				
@@ -266,6 +266,7 @@ public class DBQuery {
 		loadedTicket = 0;		
 		for (EventSearchInfo esi : eventsSearch.getEventSearchInfo()) {
 			try {
+				log.info("Servicio:"+esi.getId());
 				Servicio servicio = new Servicio(esi.getId(), esi.getTitle());
 				Date fechaInicio = getDateFromXML(esi.getDates().getDatetime(),"EVENT_BEGIN").orElse(null);
 				Date fechaFin = getDateFromXML(esi.getDates().getDatetime(),"EVENT_END").orElse(null);

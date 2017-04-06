@@ -86,15 +86,15 @@ public class Availability {
 		servicioCupoRepo.findAll().forEach(p -> infiniteCapacity |= (idEvent == p.getId() && p.getCupo().equals("N")));
 		if (!infiniteCapacity) {
 			SessionInfo sessionInfo = eventInfo.getSessionsInfo().getSessionInfo().get(0);
-			infgen.setCodser(sessionInfo.getId().intValue());
+			infgen.setCodser(idEvent);
 			Date inicioSesion = sessionInfo.getDates().getDatetime().get(0).getValue().toGregorianCalendar().getTime();
 
 			// Tickets/Caracteríticas
 			for (es.oneboxtm.ns.data_query.prices.ActivityTicketTypeAvailability atta : sessionInfo
 					.getActivityTicketTypesAvailability().getActivityTicketTypeAvailability()) {
 				Infsmo infsmo = new Infsmo();
-				infsmo.setCodsmo(idEvent + "#" + idSession + "#" + df.format(inicioSesion));
-				infsmo.setCodcon(idSession + "#" + atta.getId());
+				infsmo.setCodsmo(idSession + "#" + df.format(inicioSesion));
+				infsmo.setCodcon(idSession + "#"+sessionInfo.getName() +"#" + atta.getId());
 				int cupoCaracteristica = atta.getAvailabilityInfo().getAvailable().intValue();
 				infsmo.setId(atta.getId().intValue());
 				infsmo.setCapmax(cupoCaracteristica);
