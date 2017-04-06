@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 
 import com.epl.onebox.model.ActivityTicketTypeAvailability;
 import com.epl.onebox.model.BasicInfoSessionSearchInfo;
-import com.epl.onebox.model.Charge;
 import com.epl.onebox.model.Datetime;
 import com.epl.onebox.model.EventSearchInfo;
 import com.epl.onebox.model.EventsSearch;
@@ -196,13 +195,7 @@ public class DBQuery {
 		for (ActivityTicketTypeAvailability at : bissi.getActivityTicketTypesAvailability()
 				.getActivityTicketTypeAvailability()) {
 			try {
-				float price = Float.valueOf(at.getIndividualPrice().getPromotedPrice().floatValue());
-				for (Charge charge : at.getIndividualPrice().getPromotedPriceCharges().getCharge()) // Añade
-																									// precios
-																									// de
-																									// los
-																									// cargos.
-				price += charge.getValue().floatValue();
+				float price = Float.valueOf(at.getIndividualPrice().getPromotedPrice().floatValue());				
 				ticket = new Ticket((long) at.getId(), at.getName().getValue(), price, 0, modalidad, servicio);
 				ticketRepo.save(ticket);
 				loadedTicket++;

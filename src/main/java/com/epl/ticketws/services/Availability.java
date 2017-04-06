@@ -99,6 +99,7 @@ public class Availability {
 				infsmo.setId(atta.getId().intValue());
 				infsmo.setCapmax(cupoCaracteristica);
 				infsmo.setCupest((cupoCaracteristica > 0) ? "DS" : "ND");
+				infsmo.setImpcom(atta.getIndividualPrice().getPromotedPrice().floatValue());
 				infsmo.setRefdis(0);
 				infgen.getInfsmos().add(infsmo);
 			}
