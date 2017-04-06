@@ -15,6 +15,7 @@ import com.epl.tickets.model.DisponibilidadGeneralRespuesta;
 import com.epl.tickets.model.Infgen;
 import com.epl.tickets.model.Infsmo;
 import com.epl.ticketws.repo.ErrorRepo;
+import com.epl.ticketws.repo.ServicioCupoRepo;
 
 import es.oneboxtm.ns.data_query.event.EventInfo;
 import es.oneboxtm.ns.data_query.session.SessionInfo;
@@ -33,11 +34,14 @@ public class Availability {
 	private String urlSessionInfo;
 
 	@Autowired
+	private ServicioCupoRepo servicioCupoRepo;
+
+	@Autowired
 	private QueryService<EventInfo> oneboxEventInfo;
 
 	@Autowired
 	private QueryService<SessionInfo> oneboxSessionInfo;
-
+	private boolean infiniteCapacity;
 	// @Autowired
 	// private QueryService<SessionInfo> oneboxSession;
 
@@ -67,7 +71,6 @@ public class Availability {
 		return Optional.empty();
 	}
 
-
 	private DisponibilidadGeneralRespuesta getXMLResponse(int idEvent, int idSession, EventInfo eventInfo) {
 		DisponibilidadGeneralRespuesta dgr = new DisponibilidadGeneralRespuesta();
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
@@ -79,20 +82,36 @@ public class Availability {
 		infgen.setCodtse("ACTI");
 		infgen.setId(idEvent);
 		infgen.setNomser(eventInfo.getTitle());
-		SessionInfo sessionInfo = eventInfo.getSessionsInfo().getSessionInfo().get(0);
-		infgen.setCodser(sessionInfo.getId().intValue());
-		Date inicioSesion = sessionInfo.getDates().getDatetime().get(0).getValue().toGregorianCalendar().getTime();
-	
-		// Tickets/Caracteríticas
-		for (es.oneboxtm.ns.data_query.prices.ActivityTicketTypeAvailability atta:sessionInfo.getActivityTicketTypesAvailability().getActivityTicketTypeAvailability()){
+		infiniteCapacity = false;
+		servicioCupoRepo.findAll().forEach(p -> infiniteCapacity |= (idEvent == p.getId() && p.getCupo().equals("N")));
+		if (!infiniteCapacity) {
+			SessionInfo sessionInfo = eventInfo.getSessionsInfo().getSessionInfo().get(0);
+			infgen.setCodser(sessionInfo.getId().intValue());
+			Date inicioSesion = sessionInfo.getDates().getDatetime().get(0).getValue().toGregorianCalendar().getTime();
+
+			// Tickets/Caracteríticas
+			for (es.oneboxtm.ns.data_query.prices.ActivityTicketTypeAvailability atta : sessionInfo
+					.getActivityTicketTypesAvailability().getActivityTicketTypeAvailability()) {
+				Infsmo infsmo = new Infsmo();
+				infsmo.setCodsmo(idEvent + "#" + idSession + "#" + df.format(inicioSesion));
+				infsmo.setCodcon(idSession + "#" + atta.getId());
+				int cupoCaracteristica = atta.getAvailabilityInfo().getAvailable().intValue();
+				infsmo.setId(atta.getId().intValue());
+				infsmo.setCapmax(cupoCaracteristica);
+				infsmo.setCupest((cupoCaracteristica > 0) ? "DS" : "ND");
+				infsmo.setRefdis(0);
+				infgen.getInfsmos().add(infsmo);
+			}
+		} else {
 			Infsmo infsmo = new Infsmo();
-			infsmo.setCodsmo(idEvent+"#" + idSession+"#" + df.format(inicioSesion));
-			infsmo.setCodcon(idSession+"#"+atta.getId());  
-			int cupoCaracteristica = atta.getAvailabilityInfo().getAvailable().intValue();
-			infsmo.setId(atta.getId().intValue());
-			infsmo.setCapmax(cupoCaracteristica);			
-			infsmo.setCupest((cupoCaracteristica>0)?"DS":"ND");			
-			infgen.getInfsmos().add(infsmo);			
+			infsmo.setCodsmo(idEvent + "#" + idSession);
+			infsmo.setCodcon(idSession + "#0");
+			int cupoCaracteristica = 1000;
+			infsmo.setId(0);
+			infsmo.setCapmax(cupoCaracteristica);
+			infsmo.setCupest((cupoCaracteristica > 0) ? "DS" : "ND");
+			infsmo.setRefdis(0);
+			infgen.getInfsmos().add(infsmo);
 		}
 		dgr.getInfgens().add(infgen);
 		return dgr;
@@ -109,8 +128,8 @@ public class Availability {
 			urlEventInfo = String.format(urlEventInfo, idEvent);
 			EventInfo eventInfo = oneboxEventInfo.query(urlEventInfo, "GET", "XML", EventInfo.class, null);
 			SessionsInfo sessionsInfo = new SessionsInfo();
-			sessionsInfo.setSessionInfo(eventInfo.getSessionsInfo().getSessionInfo().stream().filter(p -> p.getId().intValue()==idSession).collect(Collectors.toList()));
-			
+			sessionsInfo.setSessionInfo(eventInfo.getSessionsInfo().getSessionInfo().stream()
+					.filter(p -> p.getId().intValue() == idSession).collect(Collectors.toList()));
 			eventInfo.setSessionsInfo(sessionsInfo);
 			DisponibilidadGeneralRespuesta dgr = getXMLResponse(idEvent, idSession, eventInfo);
 			return Optional.of(dgr);
@@ -118,49 +137,44 @@ public class Availability {
 			log.error("Error en la disponibilidad de ticket", thx);
 			errorRepo.handleError("Error en la disponibilidad de ticket", thx);
 		}
-		return Optional.empty(); 								
-	}	
-/*
-	private void loadTickets(DisponibilidadGeneralRespuesta dgr, EventSearchInfo eventSearchInfo) {
-		Infgen infgen = new Infgen();
-		infgen.setCoddiv("EUR");
-		infgen.setCupest("DS");
-		infgen.setCodtou("EPL");
-		infgen.setId((int) eventSearchInfo.getId());
-		infgen.setNomser(eventSearchInfo.getTitle());
-		infgen.setCodser((int) eventSearchInfo.getId());
-		// Todo implementar la generacion de Infgen y Infsmo
-		for (BasicInfoSessionSearchInfo sessionsSearchInfo : eventSearchInfo.getSessionsSearchInfo()
-				.getSessionSearchInfo()) {
-			for (ActivityTicketTypeAvailability activityTicketTypeAvailability : sessionsSearchInfo
-					.getActivityTicketTypesAvailability().getActivityTicketTypeAvailability()) {
-				String available = activityTicketTypeAvailability.getAvailabilityInfo().getAvailable() != null
-						? String.valueOf(activityTicketTypeAvailability.getAvailabilityInfo().getAvailable()) : "DS";
-				if (!"0".equals(available)) {
-					Infsmo infsmo = new Infsmo();
-					infsmo.setCodsmo(String.valueOf(eventSearchInfo.getId()) + "#" + sessionsSearchInfo.getRates());// #modalidad+#descmodalidad
-					infsmo.setCodcon(
-							String.valueOf(eventSearchInfo.getId()) + "#" + activityTicketTypeAvailability.getId()); // descripcion
-																														// modalidad
-					infsmo.setCodcha(activityTicketTypeAvailability.getName().getValue());
-					infsmo.setCupest("DS");
-					infsmo.setAdlmax(activityTicketTypeAvailability.getName().getValue().contains("Adulto") ? 1 : 0);
-					infsmo.setNinmax(activityTicketTypeAvailability.getName().getValue().contains("Junior") ? 1 : 0);
-					infsmo.setRefdis(activityTicketTypeAvailability.getId()); // #Ticket
-					float price = Float.valueOf(
-							activityTicketTypeAvailability.getIndividualPrice().getPromotedPrice().floatValue());
-					for (Charge charge : activityTicketTypeAvailability.getIndividualPrice().getPromotedPriceCharges()
-							.getCharge()) { // Añade precios de los cargos.
-						price += charge.getValue().floatValue();
-					}
-					infsmo.setImpcom(price);
-					infsmo.setCupest(available);
-					infgen.getInfsmos().add(infsmo);
-				}
-			}
-
-		}
-		dgr.getInfgens().add(infgen);
+		return Optional.empty();
 	}
-*/
+	/*
+	 * private void loadTickets(DisponibilidadGeneralRespuesta dgr,
+	 * EventSearchInfo eventSearchInfo) { Infgen infgen = new Infgen();
+	 * infgen.setCoddiv("EUR"); infgen.setCupest("DS"); infgen.setCodtou("EPL");
+	 * infgen.setId((int) eventSearchInfo.getId());
+	 * infgen.setNomser(eventSearchInfo.getTitle()); infgen.setCodser((int)
+	 * eventSearchInfo.getId()); // Todo implementar la generacion de Infgen y
+	 * Infsmo for (BasicInfoSessionSearchInfo sessionsSearchInfo :
+	 * eventSearchInfo.getSessionsSearchInfo() .getSessionSearchInfo()) { for
+	 * (ActivityTicketTypeAvailability activityTicketTypeAvailability :
+	 * sessionsSearchInfo
+	 * .getActivityTicketTypesAvailability().getActivityTicketTypeAvailability()
+	 * ) { String available =
+	 * activityTicketTypeAvailability.getAvailabilityInfo().getAvailable() !=
+	 * null ?
+	 * String.valueOf(activityTicketTypeAvailability.getAvailabilityInfo().
+	 * getAvailable()) : "DS"; if (!"0".equals(available)) { Infsmo infsmo = new
+	 * Infsmo(); infsmo.setCodsmo(String.valueOf(eventSearchInfo.getId()) + "#"
+	 * + sessionsSearchInfo.getRates());// #modalidad+#descmodalidad
+	 * infsmo.setCodcon( String.valueOf(eventSearchInfo.getId()) + "#" +
+	 * activityTicketTypeAvailability.getId()); // descripcion // modalidad
+	 * infsmo.setCodcha(activityTicketTypeAvailability.getName().getValue());
+	 * infsmo.setCupest("DS");
+	 * infsmo.setAdlmax(activityTicketTypeAvailability.getName().getValue().
+	 * contains("Adulto") ? 1 : 0);
+	 * infsmo.setNinmax(activityTicketTypeAvailability.getName().getValue().
+	 * contains("Junior") ? 1 : 0);
+	 * infsmo.setRefdis(activityTicketTypeAvailability.getId()); // #Ticket
+	 * float price = Float.valueOf(
+	 * activityTicketTypeAvailability.getIndividualPrice().getPromotedPrice().
+	 * floatValue()); for (Charge charge :
+	 * activityTicketTypeAvailability.getIndividualPrice().
+	 * getPromotedPriceCharges() .getCharge()) { // Añade precios de los cargos.
+	 * price += charge.getValue().floatValue(); } infsmo.setImpcom(price);
+	 * infsmo.setCupest(available); infgen.getInfsmos().add(infsmo); } }
+	 * 
+	 * } dgr.getInfgens().add(infgen); }
+	 */
 }
