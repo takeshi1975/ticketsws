@@ -8,12 +8,10 @@
 
 package com.epl.tickets.model;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -27,9 +25,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * <p>Clase Java para anonymous complex type.
- * 
+ * <p>
  * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
- * 
+ * <p>
  * <pre>
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
@@ -50,26 +48,27 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "codage",
-    "fecini",
-    "fecfin",
-    "nomser",
-    "codzge",
-    "codtse",
-    "codser",
-    "impcom",
-    "estsmo"
+        "codage",
+        "fecini",
+        "fecfin",
+        "nomser",
+        "codzge",
+        "codtse",
+        "codser",
+        "barcode",
+        "impcom",
+        "estsmo",
+        "condgen",
+        "rulegen",
+
 })
 @XmlRootElement(name = "resser")
-public class Resser implements Serializable {
+public class Resser {
 
-	private static final long serialVersionUID = -6945818291574926271L;
-	@XmlElement(required = true)
+    @XmlElement(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "NCName")
     protected String codage;
@@ -90,19 +89,26 @@ public class Resser implements Serializable {
     @XmlElement(required = true)
     protected BigInteger codser;
     @XmlElement(required = true)
+    protected String barcode;
+    @XmlElement(required = true)
     protected BigDecimal impcom;
     @XmlElement(required = true)
     protected List<Estsmo> estsmo;
     @XmlAttribute(name = "id", required = true)
     protected BigInteger id;
 
+    @XmlElement(required = true)
+    protected List<String> condgen;
+
+    @XmlElement(required = true)
+    protected List<String> rulegen;
+
+
     /**
      * Obtiene el valor de la propiedad codage.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCodage() {
         return codage;
@@ -110,11 +116,9 @@ public class Resser implements Serializable {
 
     /**
      * Define el valor de la propiedad codage.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCodage(String value) {
         this.codage = value;
@@ -122,11 +126,9 @@ public class Resser implements Serializable {
 
     /**
      * Obtiene el valor de la propiedad fecini.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getFecini() {
         return fecini;
@@ -134,11 +136,9 @@ public class Resser implements Serializable {
 
     /**
      * Define el valor de la propiedad fecini.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setFecini(String value) {
         this.fecini = value;
@@ -146,11 +146,9 @@ public class Resser implements Serializable {
 
     /**
      * Obtiene el valor de la propiedad fecfin.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getFecfin() {
         return fecfin;
@@ -158,11 +156,9 @@ public class Resser implements Serializable {
 
     /**
      * Define el valor de la propiedad fecfin.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setFecfin(String value) {
         this.fecfin = value;
@@ -170,11 +166,9 @@ public class Resser implements Serializable {
 
     /**
      * Obtiene el valor de la propiedad nomser.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getNomser() {
         return nomser;
@@ -182,11 +176,9 @@ public class Resser implements Serializable {
 
     /**
      * Define el valor de la propiedad nomser.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setNomser(String value) {
         this.nomser = value;
@@ -194,11 +186,9 @@ public class Resser implements Serializable {
 
     /**
      * Obtiene el valor de la propiedad codzge.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCodzge() {
         return codzge;
@@ -206,11 +196,9 @@ public class Resser implements Serializable {
 
     /**
      * Define el valor de la propiedad codzge.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCodzge(String value) {
         this.codzge = value;
@@ -218,11 +206,9 @@ public class Resser implements Serializable {
 
     /**
      * Obtiene el valor de la propiedad codtse.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCodtse() {
         return codtse;
@@ -230,11 +216,9 @@ public class Resser implements Serializable {
 
     /**
      * Define el valor de la propiedad codtse.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCodtse(String value) {
         this.codtse = value;
@@ -242,11 +226,9 @@ public class Resser implements Serializable {
 
     /**
      * Obtiene el valor de la propiedad codser.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
+     *
+     * @return possible object is
+     * {@link BigInteger }
      */
     public BigInteger getCodser() {
         return codser;
@@ -254,23 +236,34 @@ public class Resser implements Serializable {
 
     /**
      * Define el valor de la propiedad codser.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link BigInteger }
      */
     public void setCodser(BigInteger value) {
         this.codser = value;
     }
 
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    /**
+     * Define el valor de la propiedad barcode.
+     *
+     * @param value allowed object is
+     *              {@link BigInteger }
+     */
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+
     /**
      * Obtiene el valor de la propiedad impcom.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigDecimal }
-     *     
+     *
+     * @return possible object is
+     * {@link BigDecimal }
      */
     public BigDecimal getImpcom() {
         return impcom;
@@ -278,11 +271,9 @@ public class Resser implements Serializable {
 
     /**
      * Define el valor de la propiedad impcom.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigDecimal }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link BigDecimal }
      */
     public void setImpcom(BigDecimal value) {
         this.impcom = value;
@@ -290,25 +281,23 @@ public class Resser implements Serializable {
 
     /**
      * Gets the value of the estsmo property.
-     * 
+     * <p>
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the estsmo property.
-     * 
+     * <p>
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getEstsmo().add(newItem);
      * </pre>
-     * 
-     * 
+     * <p>
+     * <p>
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Estsmo }
-     * 
-     * 
      */
     public List<Estsmo> getEstsmo() {
         if (estsmo == null) {
@@ -317,13 +306,26 @@ public class Resser implements Serializable {
         return this.estsmo;
     }
 
+
+    public List<String> getCondgen() {
+        if (condgen == null) {
+            condgen = new ArrayList<>();
+        }
+        return this.condgen;
+    }
+
+    public List<String> getRulegen() {
+        if (rulegen == null) {
+            rulegen = new ArrayList<>();
+        }
+        return this.rulegen;
+    }
+
     /**
      * Obtiene el valor de la propiedad id.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
+     *
+     * @return possible object is
+     * {@link BigInteger }
      */
     public BigInteger getId() {
         return id;
@@ -331,11 +333,9 @@ public class Resser implements Serializable {
 
     /**
      * Define el valor de la propiedad id.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link BigInteger }
      */
     public void setId(BigInteger value) {
         this.id = value;

@@ -1,5 +1,6 @@
 package com.epl.ticketws.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,7 +10,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +31,7 @@ import com.epl.ticketws.dto.Response;
 import com.epl.ticketws.services.Availability;
 import com.epl.ticketws.services.Book;
 import com.epl.ticketws.services.DBQuery;
+import com.epl.ticketws.services.TicketPdf;
 import com.epl.ticketws.services.Voucher;
 
 @RestController
@@ -48,6 +53,10 @@ public class TicketController {
 
 	@Autowired
 	private DBQuery dbQuery;
+	
+	@Autowired
+	private TicketPdf ticketPdf;
+	
 
 	@Transactional
 	@RequestMapping(value = "/delete", method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
@@ -179,6 +188,20 @@ public class TicketController {
 	@RequestMapping(value = "/voucher/orderCode/{orderCode}", method = RequestMethod.POST, produces = MediaType.APPLICATION_XML_VALUE)
 	public InformeCrearRespuesta ticketsPdf(@PathVariable String orderCode) {
 		return voucher.getTicketsPdf(orderCode);
+	}
+
+	@RequestMapping(value = "/ticketsPdf/orderCode/{orderCode}", produces = "application/pdf")
+	public ResponseEntity<InputStreamResource> generateTickets(@PathVariable String orderCode) {
+		byte[] data = ticketPdf.generateTickets(orderCode);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-disposition", "attachment;filename=" + orderCode + ".pdf");
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+
+		return ResponseEntity.ok().headers(headers).contentLength(data.length)
+				.contentType(MediaType.parseMediaType("application/octet-stream"))
+				.body(new InputStreamResource(new ByteArrayInputStream(data)));
 	}
 
 }

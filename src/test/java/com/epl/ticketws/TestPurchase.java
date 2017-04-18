@@ -38,7 +38,9 @@ public class TestPurchase {
 		List<TicketOrder> ticketOrders = new ArrayList<TicketOrder>();
 		ticketOrders.add(new TicketOrder("131155","23173","1"));		
 		purchase.setTicketOrders(ticketOrders);
-		ReservaCerrarRespuesta respuesta = restTemplate.postForObject("/tickets/purchase", purchase, ReservaCerrarRespuesta.class);		
+		//ReservaCerrarRespuesta respuesta = restTemplate.postForObject("/tickets/purchase", purchase, ReservaCerrarRespuesta.class);		
+		ReservaCerrarRespuesta respuesta =restTemplate.postForObject("http://localhost:6789/tickets/purchase", purchase, ReservaCerrarRespuesta.class);
+		
 		assert respuesta!=null; 
 		logger.info("Localizador de la compra "+respuesta.getLocata());		
 	}

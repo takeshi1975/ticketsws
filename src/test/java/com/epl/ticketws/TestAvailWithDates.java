@@ -28,10 +28,10 @@ public class TestAvailWithDates{
 	public void testAvailWithDates() {		
 		logger.info("Se pide disponibilidad sin fechas... para obtener informacion de cupos...");
 		//this.restTemplate.getForObject("/tickets/load", String.class); // Cargamos los datos
-		String url = "/tickets/availevent/131156/idevent";							  		
+		String url = "/tickets/availevent/idevent/2881/idsession/125522";						  		
 		String json = this.restTemplate.getForObject(url, String.class);
 		Assert.assertNotNull("Couldn't see any response",json);	
-		Assert.assertThat("Response not contains infgen", json, containsString("<infgen"));
+		Assert.assertThat("Response not contains infgen", json, containsString("<infgen>"));
 		logger.info(json.substring(0, 100));	
 		assertThat(json).contains("<infgen>");
 		logger.info(url);

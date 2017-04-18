@@ -14,8 +14,10 @@ import org.springframework.stereotype.Component;
 import com.epl.tickets.model.DisponibilidadGeneralRespuesta;
 import com.epl.tickets.model.Infgen;
 import com.epl.tickets.model.Infsmo;
+import com.epl.ticketws.dto.Ticket;
 import com.epl.ticketws.repo.ErrorRepo;
 import com.epl.ticketws.repo.ServicioCupoRepo;
+import com.epl.ticketws.repo.TicketRepo;
 
 import es.oneboxtm.ns.data_query.event.EventInfo;
 import es.oneboxtm.ns.data_query.session.SessionInfo;
@@ -32,6 +34,9 @@ public class Availability {
 
 	@Value("${app.onebox.url.session.info}")
 	private String urlSessionInfo;
+
+	@Autowired
+	private TicketRepo ticketRepo;
 
 	@Autowired
 	private ServicioCupoRepo servicioCupoRepo;
@@ -90,11 +95,11 @@ public class Availability {
 			Date inicioSesion = sessionInfo.getDates().getDatetime().get(0).getValue().toGregorianCalendar().getTime();
 
 			// Tickets/Caracteríticas
-			for (es.oneboxtm.ns.data_query.prices.ActivityTicketTypeAvailability atta : sessionInfo
-					.getActivityTicketTypesAvailability().getActivityTicketTypeAvailability()) {
+			sessionInfo.getActivityTicketTypesAvailability().getActivityTicketTypeAvailability().forEach( atta-> {
 				Infsmo infsmo = new Infsmo();
+				infsmo.setCodcha(atta.getName()); // Tipo de característica...
 				infsmo.setCodsmo(idSession + "#" + df.format(inicioSesion));
-				infsmo.setCodcon(idSession + "#"+sessionInfo.getName() +"#" + atta.getId());
+				infsmo.setCodcon(idSession + "#" + atta.getId());
 				int cupoCaracteristica = atta.getAvailabilityInfo().getAvailable().intValue();
 				infsmo.setId(atta.getId().intValue());
 				infsmo.setCapmax(cupoCaracteristica);
@@ -102,17 +107,20 @@ public class Availability {
 				infsmo.setImpcom(atta.getIndividualPrice().getPromotedPrice().floatValue());
 				infsmo.setRefdis(0);
 				infgen.getInfsmos().add(infsmo);
-			}
+			});
 		} else {
-			Infsmo infsmo = new Infsmo();
-			infsmo.setCodsmo(idEvent + "#" + idSession);
-			infsmo.setCodcon(idSession + "#0");
-			int cupoCaracteristica = 1000;
-			infsmo.setId(0);
-			infsmo.setCapmax(cupoCaracteristica);
-			infsmo.setCupest((cupoCaracteristica > 0) ? "DS" : "ND");
-			infsmo.setRefdis(0);
-			infgen.getInfsmos().add(infsmo);
+			ticketRepo.findByModalidadId(idSession).forEach(ticket -> {
+				Infsmo infsmo = new Infsmo();
+				infsmo.setCodcha(ticket.getCaracteristica());
+				infsmo.setCodsmo(idSession + "#" );
+				infsmo.setCodcon(idSession + "#" + ticket.getTicketPK().getId());				
+				infsmo.setId((int) ticket.getTicketPK().getId());
+				infsmo.setCapmax(9999);
+				infsmo.setCupest("DS");
+				infsmo.setImpcom(ticket.getPrecio());
+				infsmo.setRefdis(0);
+				infgen.getInfsmos().add(infsmo);
+			});
 		}
 		dgr.getInfgens().add(infgen);
 		return dgr;
@@ -122,6 +130,9 @@ public class Availability {
 	 * Información del evento para controlar el cupo!
 	 * 
 	 * @param idEvent
+	 *            --> Servicio
+	 * @param idSession
+	 *            --> Modalidad Devuelve el cupo de los 4 tipos de pasajeros.
 	 * @return
 	 */
 	public Optional<DisponibilidadGeneralRespuesta> eventInfo(int idEvent, int idSession) {

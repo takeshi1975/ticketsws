@@ -1,14 +1,8 @@
 package com.epl.tickets.model;
 
-import java.io.Serializable;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * Created by gcortes on 14/03/2017.
@@ -17,16 +11,18 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
         "ideses",
         "infpdf",
+        "resser",
         "tiperr"
 })
 @XmlRootElement(name = "InformeCrearRespuesta")
-public class InformeCrearRespuesta implements Serializable	{
-		
-	private static final long serialVersionUID = 1L;
-	@XmlElement(required = true)
+public class InformeCrearRespuesta {
+
+    @XmlElement(required = true)
     protected String ideses;
     @XmlElement(name="")
     protected List<String> infpdf;
+    @XmlElement(required = true)
+    protected List<Resser> resser;
     @XmlElement(required = true)
     protected String tiperr;
 
@@ -80,6 +76,13 @@ public class InformeCrearRespuesta implements Serializable	{
         if (infpdf==null)
             infpdf = new ArrayList<String>();
         return infpdf;
+    }
+
+    public List<Resser> getResser() {
+        if (resser == null) {
+            resser = new ArrayList<Resser>();
+        }
+        return this.resser;
     }
 
     /**
