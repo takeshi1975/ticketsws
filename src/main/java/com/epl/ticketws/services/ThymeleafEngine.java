@@ -3,20 +3,19 @@ package com.epl.ticketws.services;
 
 
 
-import com.epl.tickets.model.InformeCrearRespuesta;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+import java.io.InputStream;
+import java.util.Locale;
+import java.util.Map;
+
 import org.apache.commons.io.IOUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.context.WebContext;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import java.io.*;
-import java.util.Locale;
-import java.util.Map;
+import com.epl.tickets.model.InformeCrearRespuesta;
+import java.util.Base64;
 
 
 /**
@@ -61,7 +60,9 @@ public class ThymeleafEngine {
 
             ThymeleafContext context = new ThymeleafContext(Locale.ENGLISH);
             InputStream inputStream = ThymeleafEngine.class.getResourceAsStream("/images/barcode.png");
-            String qrImage = Base64.encode(IOUtils.toByteArray(inputStream));
+            byte buffer[] = new byte[inputStream.available()];
+            inputStream.read(buffer);
+            String qrImage = Base64.getEncoder().encodeToString(buffer);            
             context.setThymeleafTemplate("voucher");
             InformeCrearRespuesta informeCrearRespuesta = new InformeCrearRespuesta();
             informeCrearRespuesta.getInfpdf().add(qrImage);
