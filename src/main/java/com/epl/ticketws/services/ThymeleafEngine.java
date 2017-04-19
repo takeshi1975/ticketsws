@@ -1,13 +1,10 @@
 package com.epl.ticketws.services;
 
-
-
-
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
@@ -15,7 +12,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import com.epl.tickets.model.InformeCrearRespuesta;
-import java.util.Base64;
 
 
 /**
@@ -51,9 +47,6 @@ public class ThymeleafEngine {
 
         return newTemplateEngine;
     }
-
-
-
 
     public static void main(String args[]){
         try{
