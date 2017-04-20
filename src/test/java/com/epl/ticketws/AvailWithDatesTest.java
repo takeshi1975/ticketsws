@@ -18,11 +18,11 @@ import static org.hamcrest.CoreMatchers.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @EnableCaching
-public class TestAvailWithDates{
+public class AvailWithDatesTest{
 
 	@Autowired
 	private TestRestTemplate restTemplate;
-	private static final Logger logger = Logger.getLogger(TestAvailWithDates.class);
+	private static final Logger logger = Logger.getLogger(AvailWithDatesTest.class);
 
 	@Test
 	public void testAvailWithDates() {		
