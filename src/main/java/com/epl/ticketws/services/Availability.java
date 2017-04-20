@@ -62,9 +62,7 @@ public class Availability {
 	 * @param fecha1
 	 * @param fecha2
 	 */
-	public Optional<DisponibilidadGeneralRespuesta> sessionInfo(int idSession) {
-
-		urlEventInfo = String.format(urlEventInfo, idSession);
+	public Optional<DisponibilidadGeneralRespuesta> sessionInfo(int idSession) {		
 		try {
 			SessionInfo sessionInfo = oneboxSessionInfo.query(urlSessionInfo, "GET", "XML", SessionInfo.class, null);
 			int cupo = sessionInfo.getAvailabilityInfo().getAvailable().intValue();
@@ -90,6 +88,7 @@ public class Availability {
 		infiniteCapacity = false;
 		servicioCupoRepo.findAll().forEach(p -> infiniteCapacity |= (idEvent == p.getId() && p.getCupo().equals("N")));
 		if (!infiniteCapacity) {
+			log.info("Size de sessiones -->" + eventInfo.getSessionsInfo().getSessionInfo().size());
 			SessionInfo sessionInfo = eventInfo.getSessionsInfo().getSessionInfo().get(0);
 			infgen.setCodser(idEvent);
 			Date inicioSesion = sessionInfo.getDates().getDatetime().get(0).getValue().toGregorianCalendar().getTime();
@@ -137,12 +136,14 @@ public class Availability {
 	 */
 	public Optional<DisponibilidadGeneralRespuesta> eventInfo(int idEvent, int idSession) {
 		try {
-			urlEventInfo = String.format(urlEventInfo, idEvent);
-			EventInfo eventInfo = oneboxEventInfo.query(urlEventInfo, "GET", "XML", EventInfo.class, null);
+			String url = urlEventInfo;
+			url  = String.format(url, idEvent);
+			EventInfo eventInfo = oneboxEventInfo.query(url , "GET", "XML", EventInfo.class, null);
 			SessionsInfo sessionsInfo = new SessionsInfo();
 			sessionsInfo.setSessionInfo(eventInfo.getSessionsInfo().getSessionInfo().stream()
 					.filter(p -> p.getId().intValue() == idSession).collect(Collectors.toList()));
 			eventInfo.setSessionsInfo(sessionsInfo);
+			
 			DisponibilidadGeneralRespuesta dgr = getXMLResponse(idEvent, idSession, eventInfo);
 			return Optional.of(dgr);
 		} catch (Throwable thx) {
