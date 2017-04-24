@@ -1,35 +1,33 @@
 package com.epl.ticketws.services;
 
 
-import com.epl.tickets.model.InformeCrearRespuesta;
-import com.epl.tickets.model.Resser;
-import com.epl.ticketws.services.BarCodeGenerator;
-import com.epl.ticketws.services.QueryService;
-import com.epl.ticketws.services.ThymeleafContext;
-import com.epl.ticketws.services.ThymeleafEngine;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-import es.oneboxtm.ns.dates.Datetime;
-import es.oneboxtm.ns.dates.DatetimeType;
-import es.oneboxtm.ns.purchase.order.*;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import org.xhtmlrenderer.pdf.ITextRenderer;
-
-
-import java.awt.Dimension;
-import java.awt.Insets;
 import org.zefer.pd4ml.PD4Constants;
 import org.zefer.pd4ml.PD4ML;
 import org.zefer.pd4ml.PD4PageMark;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
+import com.epl.tickets.model.InformeCrearRespuesta;
+import com.epl.tickets.model.Resser;
+
+import es.oneboxtm.ns.dates.Datetime;
+import es.oneboxtm.ns.dates.DatetimeType;
+import es.oneboxtm.ns.purchase.order.OrderDetails;
+import es.oneboxtm.ns.purchase.order.OrderItem;
 
 /**
  * Created by gcortes on 04/04/2017.
@@ -71,12 +69,17 @@ public class TicketPdf implements Serializable {
                 Resser resser = new Resser();
                 byte[] b = BarCodeGenerator.generateBarcode(itemTicketInfo.getTicketData().getBarcode(),0);
                 ByteArrayInputStream bInput = new ByteArrayInputStream(b);
-                String qrImage = Base64.encode(IOUtils.toByteArray(bInput));
+                byte [] buffer = new byte[bInput.available()];
+                bInput.read(buffer);
+                String qrImage = Base64.getEncoder().encodeToString(buffer);
+                		
                 resser.setBarcode(qrImage);
 
                 b = BarCodeGenerator.generateBarcode(itemTicketInfo.getTicketData().getBarcode(),90);
                 bInput = new ByteArrayInputStream(b);
-                qrImage = Base64.encode(IOUtils.toByteArray(bInput));
+                buffer = new byte[bInput.available()];
+                bInput.read(buffer);
+                qrImage = Base64.getEncoder().encodeToString(buffer);
                 resser.setBarcodev(qrImage);
 
                 resser.setCodage(itemTicketInfo.getTicketData().getSessionBasicInfo().getEventBasicInfo().getEntidad().getName());
