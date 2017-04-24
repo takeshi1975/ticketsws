@@ -96,7 +96,7 @@ public class DBQuery {
 		
 		for (Servicio servicio:servicios){
 			n++;
-			log.info("Se procesa el servicio "+servicio.getId());
+			log.debug("Se procesa el servicio "+servicio.getId());
 			Infgen infgen = new Infgen();
 			infgen.setCoddiv("EUR");
 			infgen.setCupest("DS");
@@ -168,7 +168,7 @@ public class DBQuery {
 			fin = this.addDate(fin, 1); // Añadimos un día a la fecha de fin para que incluya la disponibilidad del último día...
 			servicios = (List<Servicio>)servicioRepo.findByDates(inicio,fin);			 			
 			if (servicios!=null)
-				log.info("SIZE-->"+servicios.size());								
+				log.debug("SIZE-->"+servicios.size());								
 			return getXMLResponse(servicios, inicio, fin).orElse(DisponibilidadGeneralRespuesta.createWithError(ERROR_DISPO));
 		}catch(Exception ex){
 			log.error("Error obteniendo la disponibilidad:", ex);
@@ -259,7 +259,7 @@ public class DBQuery {
 		loadedTicket = 0;		
 		for (EventSearchInfo esi : eventsSearch.getEventSearchInfo()) {
 			try {
-				log.info("Servicio:"+esi.getId());
+				log.debug("Servicio:"+esi.getId());
 				Servicio servicio = new Servicio(esi.getId(), esi.getTitle());
 				Date fechaInicio = getDateFromXML(esi.getDates().getDatetime(),"EVENT_BEGIN").orElse(null);
 				Date fechaFin = getDateFromXML(esi.getDates().getDatetime(),"EVENT_END").orElse(null);
@@ -281,8 +281,8 @@ public class DBQuery {
 	 * @return
 	 */	
 	public Optional<Response> load() {
-		log.info("Carga de disponibilidad sin parámetros");
-		log.info("URL -->" + urlDispo);		
+		log.debug("Carga de disponibilidad sin parámetros");
+		log.debug("URL -->" + urlDispo);		
 		String msg = null;
 		try{
 			errors.clear();						

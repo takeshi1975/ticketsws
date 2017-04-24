@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.epl.ticketws</groupId>
 	<artifactId>ticketws</artifactId>
-	<version>0.9.5</version>
+	<version>0.9.6</version>
 	<packaging>war</packaging>
 	<name>ticketws</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Onebox Integration</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -193,6 +194,11 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>com.jamonapi</groupId>
+			<artifactId>jamon</artifactId>
+			<version>2.81</version>
+		</dependency>
 	</dependencies>
 
 	<build>

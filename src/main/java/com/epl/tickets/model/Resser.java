@@ -59,6 +59,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
         "codtse",
         "codser",
         "barcode",
+        "barcodev",
         "impcom",
         "estsmo",
         "condgen",
@@ -90,6 +91,8 @@ public class Resser {
     protected BigInteger codser;
     @XmlElement(required = true)
     protected String barcode;
+    @XmlElement(required = true)
+    protected String barcodev;
     @XmlElement(required = true)
     protected BigDecimal impcom;
     @XmlElement(required = true)
@@ -245,6 +248,20 @@ public class Resser {
     }
 
 
+    public String getBarcodev() {
+        return barcodev;
+    }
+
+    /**
+     * Define el valor de la propiedad barcode.
+     *
+     * @param value allowed object is
+     *              {@link BigInteger }
+     */
+    public void setBarcodev(String barcodev) {
+        this.barcodev = barcodev;
+    }
+
     public String getBarcode() {
         return barcode;
     }
@@ -258,6 +275,7 @@ public class Resser {
     public void setBarcode(String barcode) {
         this.barcode = barcode;
     }
+
 
     /**
      * Obtiene el valor de la propiedad impcom.

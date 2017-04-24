@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @EnableCaching
 @SpringBootApplication
-@ComponentScan("com.epl.ticketws.controller")
+@ComponentScan({"com.epl.ticketws.controller", "com.epl.ticketws.profile"})
 public class TicketwsApplication extends SpringBootServletInitializer{
 	
 	private static final Logger logger = Logger.getLogger(TicketwsApplication.class);		
