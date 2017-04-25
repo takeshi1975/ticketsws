@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.epl.tickets.model.Estsmo;
 import com.epl.tickets.model.Purchase;
@@ -24,7 +24,7 @@ import es.oneboxtm.ns.shopping.cart.ShoppingCart;
  * Created by gcortes on 10/03/2017.
  */
 
-@Component
+@Service
 public class Book{
 
 	private final String XML = "xml";

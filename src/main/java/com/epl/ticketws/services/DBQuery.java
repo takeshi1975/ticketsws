@@ -72,8 +72,6 @@ public class DBQuery {
 	@Autowired
 	private ServicioRepo servicioRepo;
 	
-	
-	
 	@Autowired
 	private ErrorRepo errorRepo;	
 	
