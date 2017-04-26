@@ -1,6 +1,5 @@
 package com.epl.ticketws.services;
 
-
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.io.ByteArrayInputStream;
@@ -13,7 +12,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -34,9 +32,11 @@ import es.oneboxtm.ns.purchase.order.OrderItem;
  */
 @Repository
 public class TicketPdf implements Serializable {
+    
+	private static final long serialVersionUID = 1L;
 
-    @Value("${app.onebox.url.ticketsPDF}")
-    private static String url_ticketsInfo = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/order/details";
+	@Value("${app.onebox.url.ticketsPDF}")
+    private String url_ticketsInfo = "http://pre.rest2.oneboxtickets.com/onebox-rest2/rest/order/details";
 
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -138,8 +138,7 @@ public class TicketPdf implements Serializable {
 
         StringReader input = new StringReader(content);
 
-
-        HashMap map = new HashMap();
+        HashMap<String,String> map = new HashMap<String,String>();
         map.put("pd4ml.extra.resource.loaders", "com.epl.ticketws.services.CustomPd4mlProvider");
         pd4ml.setDynamicParams(map);
 

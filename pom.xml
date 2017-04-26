@@ -213,4 +213,17 @@
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>doraemon-central</name>
+			<url>http://doraemon.com:8080/artifactory/mvnepl01</url>
+		</repository>
+		<repository>
+			<id>local</id>
+			<name>doraemon-local</name>
+			<url>http://doraemon.com:8080/artifactory/mvnepl01-local</url>
+		</repository>
+	</repositories>
+
 </project>
